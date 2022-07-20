@@ -1,0 +1,22 @@
+path.rp-branch {
+  transition: all 0.1s;
+  fill: none;
+  shape-rendering: crispEdges;
+  stroke-width: 0.15em;
+}
+
+text.rp-label {
+  font-family: Courier;
+  font-size: 1em;
+  transition: all 0.1s;
+}
+
+.rp-branch-tracer {
+  stroke: #bbb;
+  stroke-dasharray: 0.7em, 0.7em;
+  stroke-width: 0.05em;
+}
+
+path.rp-branch:hover {
+  stroke-width: 0.7em;
+}

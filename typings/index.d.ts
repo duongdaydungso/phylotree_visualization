@@ -1,2 +1,2 @@
 declare module "phylotree";
-declare module "react-phylotree";
+declare module "react-zoom-pan-pinch";

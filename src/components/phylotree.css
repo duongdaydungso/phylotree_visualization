@@ -2,7 +2,7 @@ path.rp-branch {
   transition: all 0.1s;
   fill: none;
   shape-rendering: crispEdges;
-  stroke-width: 0.15em;
+  stroke-width: 0.2em;
 }
 
 text.rp-label {

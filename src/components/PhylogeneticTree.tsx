@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { phylotree } from "phylotree";
 
@@ -9,6 +9,12 @@ import { schemeCategory10 } from "d3-scale-chromatic";
 import Branch from "./branch";
 
 import "./phylotree.css";
+
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
+import SVG from "./svg";
+
+import DropdownsMenu, { IDropdownsMenuProps } from "./DropdownsMenu";
 
 function accessor(node: any): number {
   return +node.data.attribute;
@@ -53,13 +59,44 @@ function sort_nodes(tree: any, direction: any): void {
   });
 }
 
+function isInCollapsedList(haystack: any, needle: any) {
+  for (const item of haystack) {
+    if (item.data.name === needle.data.name) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function collapsedNodeInList(tree: any, collapsedList: any, node: any) {
+  node.collapsed = isInCollapsedList(collapsedList, node);
+
+  if (node.data.name !== "root") {
+    node.hidden = node.collapsed || node.parent.hidden;
+  } else node.hidden = node.collapsed;
+
+  if (!tree.isLeafNode(node)) {
+    node.children.forEach((tmp: any) => {
+      collapsedNodeInList(tree, collapsedList, tmp);
+    });
+  }
+}
+
 function placenodes(
   tree: any,
   isShowInternalNode: boolean | undefined,
-  sort: any
+  sort: any,
+  collapsedList: any
 ): void {
+  if (tree.nodes.data.name === "new_root") return;
+
   if (sort) {
     sort_nodes(tree, sort);
+  }
+
+  if (collapsedList) {
+    collapsedNodeInList(tree, collapsedList, tree.getNodeByName("root"));
   }
 
   let current_leaf_height = -1;
@@ -99,6 +136,8 @@ function placenodes(
 
     tree.max_x = Math.max(tree.max_x, node.data.abstract_x);
 
+    if (node.data.name !== "root") node.data.abstract_y = undefined;
+
     if (!tree.isLeafNode(node)) {
       node.children.forEach(internal_node_layout);
     }
@@ -128,9 +167,10 @@ function placenodes(
   if (isShowInternalNode) {
     tree.max_y = 0;
     tree.node_order = [];
+
     internal_node_layout(tree.nodes);
 
-    const root = tree.getNodeByName("root");
+    let root = tree.getNodeByName("root");
 
     root.data.abstract_y =
       root.children
@@ -152,7 +192,8 @@ function getColorScale(tree: any, highlightBranches: boolean | undefined) {
 }
 
 export interface IPhylogeneticTreeProps {
-  newick_string: string;
+  newickString: string;
+  setNewickString: any;
   width?: number;
   height?: number;
   padding?: number;
@@ -164,7 +205,6 @@ export interface IPhylogeneticTreeProps {
   alignTips?: string;
   branchStyler?: any;
   labelStyler?: any;
-  onBranchClick?: any;
   tooltip?: any;
 }
 
@@ -173,7 +213,8 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
 ) => {
   // Destructure props
   let {
-    newick_string,
+    newickString,
+    setNewickString,
     width = 500,
     height = 500,
     padding = 20,
@@ -185,21 +226,71 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     alignTips = "left",
     branchStyler = null,
     labelStyler = null,
-    onBranchClick = () => {},
   } = props;
 
+  const [tree, setTree] = useState<any>(new phylotree(newickString));
   const [tooltip, setTooltip] = useState(false);
+  const [collapsedList, setCollapsedList] = useState([]);
+  const [dropdownsMenuState, setDropdownsMenuState] =
+    useState<IDropdownsMenuProps | null>(null);
+  const dropdownsMenuContainer = useRef<HTMLDivElement>(null);
 
-  // Create tree
-  let tree: any;
+  // Function
+  const reRoot = (node: any) => {
+    let pattern = /__reroot_top_clade/g;
+    let r = tree.getNodeByName(node.data.name);
+    let result = tree.reroot(r).getNewick().replace(pattern, "");
+    setNewickString(result);
+    setDropdownsMenuState(null);
+  };
 
-  if (!tree && !newick_string) {
-    return <g />;
-  } else if (!tree) {
-    tree = new phylotree(newick_string);
-  }
+  const toggleCollapse = (node: any) => {
+    let newCollapsedList: any;
 
-  placenodes(tree, isShowInternalNode, sort);
+    if (isInCollapsedList(collapsedList, node)) {
+      newCollapsedList = collapsedList.filter(
+        (element: any) => element.data.name !== node.data.name
+      );
+    } else {
+      newCollapsedList = collapsedList;
+
+      newCollapsedList.push(node);
+    }
+
+    setCollapsedList(newCollapsedList);
+
+    setDropdownsMenuState(null);
+  };
+
+  const handleClickOutsidedropdownsMenu = (event: any) => {
+    if (
+      dropdownsMenuContainer.current &&
+      !dropdownsMenuContainer.current.contains(event.target)
+    ) {
+      setDropdownsMenuState(null);
+    }
+  };
+
+  // Update
+  useEffect(() => {
+    setDropdownsMenuState(null);
+
+    window.addEventListener("mousedown", handleClickOutsidedropdownsMenu);
+
+    return () => {
+      window.removeEventListener("mousedown", handleClickOutsidedropdownsMenu);
+    };
+  }, []);
+
+  useEffect(() => {
+    setTree(new phylotree(newickString));
+  }, [newickString]);
+
+  // Operation
+
+  if (!tree && !newickString) return <div />;
+
+  placenodes(tree, isShowInternalNode, sort, collapsedList);
 
   function attachTextWidth(node: any): void {
     node.data.text_width = text_width(node.data.name, 14, maxLabelWidth);
@@ -235,6 +326,8 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     if (none_cross) break;
   }
 
+  if (!tree.max_x || !tree.max_y) return <div />;
+
   const x_scale = scaleLinear().domain([0, tree.max_x]).range([0, rightmost]);
 
   const y_scale = scaleLinear().domain([0, tree.max_y]).range([0, height]);
@@ -242,36 +335,57 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
   const color_scale = getColorScale(tree, highlightBranches);
 
   return (
-    <g transform={`translate(${padding}, ${padding})`}>
-      {tree.links.map((link: any) => {
-        const source_id = link.source.unique_id;
-        const target_id = link.target.unique_id;
-        const key = source_id + "," + target_id;
-        const show_label =
-          isShowInternalNode || (isShowLabels && tree.isLeafNode(link.target));
-        return (
-          <Branch
-            key={key}
-            xScale={x_scale}
-            yScale={y_scale}
-            colorScale={color_scale}
-            link={link}
-            isShowLabel={show_label}
-            maxLabelWidth={maxLabelWidth}
-            width={width}
-            alignTips={alignTips}
-            branchStyler={branchStyler}
-            labelStyler={labelStyler}
-            tooltip={props.tooltip}
-            setTooltip={setTooltip}
-            onBranchClick={onBranchClick}
+    <div>
+      <TransformWrapper minScale={1} maxScale={200}>
+        <TransformComponent>
+          <SVG width={width + 2 * padding} height={height + 2 * padding}>
+            <g transform={`translate(${padding}, ${padding})`}>
+              {tree.links.map((link: any) => {
+                const source_id = link.source.unique_id;
+                const target_id = link.target.unique_id;
+                const key = source_id + "," + target_id;
+                const show_label =
+                  isShowInternalNode ||
+                  (isShowLabels && tree.isLeafNode(link.target));
+                return (
+                  <Branch
+                    key={key}
+                    xScale={x_scale}
+                    yScale={y_scale}
+                    colorScale={color_scale}
+                    link={link}
+                    isShowLabel={show_label}
+                    maxLabelWidth={maxLabelWidth}
+                    width={width}
+                    alignTips={alignTips}
+                    branchStyler={branchStyler}
+                    labelStyler={labelStyler}
+                    tooltip={props.tooltip}
+                    setTooltip={setTooltip}
+                    onBranchClick={setDropdownsMenuState}
+                  />
+                );
+              })}
+              {tooltip ? (
+                <props.tooltip width={width} height={height} {...tooltip} />
+              ) : null}
+            </g>
+          </SVG>
+        </TransformComponent>
+      </TransformWrapper>
+      <div ref={dropdownsMenuContainer}>
+        {dropdownsMenuState ? (
+          <DropdownsMenu
+            left={dropdownsMenuState.left}
+            top={dropdownsMenuState.top}
+            currentNode={dropdownsMenuState.currentNode}
+            reRootFunction={reRoot}
+            toggleCollapse={toggleCollapse}
+            isLeaf={tree.isLeafNode(dropdownsMenuState.currentNode)}
           />
-        );
-      })}
-      {tooltip ? (
-        <props.tooltip width={width} height={height} {...tooltip} />
-      ) : null}
-    </g>
+        ) : null}
+      </div>
+    </div>
   );
 };
 

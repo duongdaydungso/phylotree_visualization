@@ -6,13 +6,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import PhylogeneticTree from "./PhylogeneticTree";
 
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-
-import SVG from "./svg";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
+  faRedo,
   faArrowLeft,
   faArrowUp,
   faArrowDown,
@@ -21,6 +18,14 @@ import {
   faAlignRight,
   faAlignLeft,
 } from "@fortawesome/free-solid-svg-icons";
+
+function Reload(props: any) {
+  return (
+    <Button title="Reload tree" variant="secondary" {...props}>
+      <FontAwesomeIcon key={1} icon={faRedo} />
+    </Button>
+  );
+}
 
 function HorizontalExpansionButton(props: any) {
   return (
@@ -125,10 +130,32 @@ export const PhylotreeVisualization: FunctionComponent<
   const [newickString, setNewickString] = useState<string>();
   const [nodeNum, setNodeNum] = useState<number>(0);
   const [width, setWidth] = useState<number>(500);
+  const [minWidth, setMinWidth] = useState<number>(500);
   const [height, setHeight] = useState<number>(500);
+  const [minHeight, setMinHeight] = useState<number>(500);
   const [sort, setSort] = useState<string | null>(null);
   const [alignTips, setAlignTips] = useState<string>("left");
   const [isShowInternalNode, setIsShowInternalNode] = useState<boolean>(false);
+
+  const [reloadState, setReloadState] = useState<boolean>(false);
+
+  // Base states
+  const baseStates = {
+    newickString: "",
+    nodeNum: 0,
+    sort: null,
+    alignTips: "left",
+    isShowInternalNode: false,
+  };
+
+  const setBaseStates = () => {
+    setNewickString(baseStates.newickString);
+    setNodeNum(baseStates.nodeNum);
+    setSort(baseStates.sort);
+    setAlignTips(baseStates.alignTips);
+    setIsShowInternalNode(baseStates.isShowInternalNode);
+    setReloadState(true);
+  };
 
   // Update
   useEffect(() => {
@@ -149,12 +176,16 @@ export const PhylotreeVisualization: FunctionComponent<
 
     setNodeNum(id / 2);
     setNewickString(result_newick);
-  }, [props.input]);
+
+    setReloadState(false);
+  }, [props.input, reloadState]);
 
   useEffect(() => {
     if (nodeNum) {
       setWidth(Math.log2(nodeNum) * widthPerNode + 2 * padding);
       setHeight(nodeNum * heightPerNode + 2 * padding);
+      setMinWidth(Math.log2(nodeNum) * widthPerNode + 2 * padding);
+      setMinHeight(nodeNum * heightPerNode + 2 * padding);
     }
   }, [nodeNum]);
 
@@ -177,10 +208,23 @@ export const PhylotreeVisualization: FunctionComponent<
         }}
       >
         <ButtonGroup style={{ display: "flex" }}>
-          <HorizontalExpansionButton onClick={() => setWidth(width + 20)} />
-          <HorizontalCompressionButton onClick={() => setWidth(width - 20)} />
-          <VerticalExpansionButton onClick={() => setHeight(height + 20)} />
-          <VerticalCompressionButton onClick={() => setHeight(height - 20)} />
+          <Reload onClick={() => setBaseStates()} />
+          <HorizontalExpansionButton
+            onClick={() => setWidth(Math.max(width + widthPerNode, minWidth))}
+          />
+          <HorizontalCompressionButton
+            onClick={() => setWidth(Math.max(width - widthPerNode, minWidth))}
+          />
+          <VerticalExpansionButton
+            onClick={() =>
+              setHeight(Math.max(height + widthPerNode, minHeight))
+            }
+          />
+          <VerticalCompressionButton
+            onClick={() =>
+              setHeight(Math.max(height - widthPerNode, minHeight))
+            }
+          />
           <AscendingSortButton onClick={() => setSort("ascending")} />
           <DescendingSortButton onClick={() => setSort("descending")} />
           <AlignTipsLeftButton onClick={() => setAlignTips("left")} />
@@ -189,30 +233,23 @@ export const PhylotreeVisualization: FunctionComponent<
         <div style={{ margin: "0px 20px" }}>
           <input
             type="checkbox"
-            onChange={() => setIsShowInternalNode(!isShowInternalNode)}
+            onChange={(e) => setIsShowInternalNode(!isShowInternalNode)}
+            checked={isShowInternalNode}
           />
-          {!isShowInternalNode ? "Hide" : "Show"} internal labels
+          {!isShowInternalNode ? " Hide" : " Show"} internal labels
         </div>
       </div>
       {newickString ? (
-        <TransformWrapper minScale={1} maxScale={200}>
-          <TransformComponent>
-            <SVG width={width} height={height}>
-              <PhylogeneticTree
-                newick_string={newickString}
-                width={width - 2 * padding}
-                height={height - 2 * padding}
-                padding={padding}
-                alignTips={alignTips}
-                sort={sort}
-                isShowInternalNode={isShowInternalNode}
-                onBranchClick={() => {
-                  console.log("click");
-                }}
-              />
-            </SVG>
-          </TransformComponent>
-        </TransformWrapper>
+        <PhylogeneticTree
+          newickString={newickString}
+          setNewickString={setNewickString}
+          width={width - 2 * padding}
+          height={height - 2 * padding}
+          padding={padding}
+          alignTips={alignTips}
+          sort={sort}
+          isShowInternalNode={isShowInternalNode}
+        />
       ) : null}
     </div>
   );

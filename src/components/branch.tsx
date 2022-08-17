@@ -81,13 +81,15 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
   const label_style =
     target.data.name && labelStyler ? labelStyler(target.data) : {};
 
+  if (target.hidden && !target.collapsed) return null;
+  if (target.data.name !== "root") if (target.parent.hidden) return null;
+
   return (
     <g className="node">
       <path
         className="rp-branch"
         fill="none"
         d={branch_line(data)}
-        onClick={() => onBranchClick(link)}
         {...all_branch_styles}
         onMouseMove={
           tooltip
@@ -107,6 +109,13 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
               }
             : undefined
         }
+        onClick={(e) => {
+          onBranchClick({
+            left: e.screenX + 20,
+            top: e.screenY - 120,
+            currentNode: target,
+          });
+        }}
       />
       {isShowLabel ? (
         <line

@@ -8,7 +8,7 @@ import { schemeCategory10 } from "d3-scale-chromatic";
 
 import Branch from "./branch";
 
-import "./phylotree.css";
+import "./style/phylotree.css";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 

@@ -1,0 +1,43 @@
+.pv-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.label-searching-form {
+  display: inline-block;
+}
+
+.tool-group {
+  margin: 20px;
+}
+
+.tool-group-upper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tool-group-lower {
+  display: flex;
+  margin: auto;
+}
+
+.spValChecker {
+  margin: 10px 30px 0 30px;
+  display: flex;
+}
+
+.spValLabel {
+  margin: 0 5px;
+  display: flex;
+}
+
+.toggle-internal-label {
+  margin: auto 30px;
+}
+
+.label-searching-form-input {
+  height: 40px;
+  text-align: center;
+}

@@ -8,7 +8,7 @@ import { schemeCategory10 } from "d3-scale-chromatic";
 
 import Branch from "./branch";
 
-import "./style/PhylogeneticTree.css";
+import "./styles/PhylogeneticTree.css";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -201,11 +201,13 @@ export interface IPhylogeneticTreeProps {
   sort?: string | null;
   maxLabelWidth?: number;
   highlightBranches?: boolean | any;
-  isShowLabels?: boolean;
+  isShowLabel?: boolean;
+  isShowBranchLength?: boolean;
   alignTips?: string;
   branchStyler?: any;
   labelStyler?: any;
   tooltip?: any;
+  supportValue: any;
 }
 
 const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
@@ -222,10 +224,12 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     sort = null,
     maxLabelWidth = 20,
     highlightBranches = false,
-    isShowLabels = true,
+    isShowLabel = true,
+    isShowBranchLength = false,
     alignTips = "left",
     branchStyler = null,
     labelStyler = null,
+    supportValue,
   } = props;
 
   const [tree, setTree] = useState<any>(new phylotree(newickString));
@@ -338,7 +342,11 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     <div>
       <TransformWrapper minScale={1} maxScale={200}>
         <TransformComponent>
-          <SVG width={width + 2 * padding} height={height + 2 * padding}>
+          <SVG
+            id="svg-phylotree"
+            width={width + 2 * padding}
+            height={height + 2 * padding}
+          >
             <g transform={`translate(${padding}, ${padding})`}>
               {tree.links.map((link: any) => {
                 const source_id = link.source.unique_id;
@@ -346,7 +354,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                 const key = source_id + "," + target_id;
                 const show_label =
                   isShowInternalNode ||
-                  (isShowLabels && tree.isLeafNode(link.target));
+                  (isShowLabel && tree.isLeafNode(link.target));
                 return (
                   <Branch
                     key={key}
@@ -355,6 +363,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                     colorScale={color_scale}
                     link={link}
                     isShowLabel={show_label}
+                    isShowBranchLength={isShowBranchLength}
                     maxLabelWidth={maxLabelWidth}
                     width={width}
                     alignTips={alignTips}
@@ -363,6 +372,9 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                     tooltip={props.tooltip}
                     setTooltip={setTooltip}
                     onBranchClick={setDropdownsMenuState}
+                    supportValue={supportValue}
+                    isCollapsed={isInCollapsedList(collapsedList, link.target)}
+                    isLeaf={tree.isLeafNode(link.target)}
                   />
                 );
               })}

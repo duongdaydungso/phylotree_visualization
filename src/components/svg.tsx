@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from "react";
 
 export interface ISVGProps {
+  id?: string;
   width?: number;
   height?: number;
   borderStyle?: string;
@@ -11,6 +12,7 @@ export interface ISVGProps {
 
 const SVG: FunctionComponent<ISVGProps> = (props) => {
   const {
+    id = "svg-chart",
     width = 500,
     height = 500,
     borderStyle = "solid",
@@ -21,6 +23,7 @@ const SVG: FunctionComponent<ISVGProps> = (props) => {
 
   return (
     <svg
+      id={id}
       width={width}
       height={height}
       style={{

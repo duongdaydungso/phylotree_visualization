@@ -9,6 +9,7 @@ export interface IBranchProps {
   yScale: any;
   colorScale: any;
   isShowLabel: boolean;
+  isShowBranchLength: boolean;
   width: number;
   maxLabelWidth: number;
   alignTips: string;
@@ -19,6 +20,9 @@ export interface IBranchProps {
   tooltip?: any;
   setTooltip?: any;
   onBranchClick?: any;
+  supportValue: any;
+  isCollapsed?: boolean;
+  isLeaf: boolean;
 }
 
 const Branch: FunctionComponent<IBranchProps> = (props) => {
@@ -29,6 +33,7 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
     yScale,
     colorScale,
     isShowLabel,
+    isShowBranchLength,
     width,
     maxLabelWidth,
     alignTips,
@@ -42,9 +47,18 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
     tooltip,
     setTooltip,
     onBranchClick,
+    supportValue,
+    isCollapsed = false,
+    isLeaf,
   } = props;
 
   const { source, target } = link;
+
+  const temp_name_array = target.data.name.split("/");
+
+  const nodeName = isLeaf
+    ? temp_name_array[0]
+    : "Node " + temp_name_array[temp_name_array.length - 1];
 
   const source_x = xScale(source.data.abstract_x);
   const source_y = yScale(source.data.abstract_y);
@@ -58,6 +72,12 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
     [source_x, source_y],
     [source_x, target_y],
     [target_x, target_y],
+  ];
+
+  const collapsedPolygon: any = [
+    [target_x + 18, target_y + 10],
+    [target_x - 2, target_y],
+    [target_x + 18, target_y - 10],
   ];
 
   const branch_line = line()
@@ -79,7 +99,9 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
   );
 
   const label_style =
-    target.data.name && labelStyler ? labelStyler(target.data) : {};
+    target.data.name && labelStyler ? labelStyler(nodeName) : {};
+
+  let firstEle = true;
 
   if (target.hidden && !target.collapsed) return null;
   if (target.data.name !== "root") if (target.parent.hidden) return null;
@@ -111,12 +133,13 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
         }
         onClick={(e) => {
           onBranchClick({
-            left: e.screenX + 20,
-            top: e.screenY - 120,
+            left: e.clientX + 20,
+            top: e.clientY - 20,
             currentNode: target,
           });
         }}
       />
+      {isCollapsed && <polygon points={collapsedPolygon} fill="grey" />}
       {isShowLabel ? (
         <line
           x1={target_x}
@@ -128,14 +151,50 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
       ) : null}
       {isShowLabel ? (
         <text
-          x={tracer_x2 + 5}
+          x={tracer_x2 + 20}
           y={target_y}
           textAnchor="start"
           alignmentBaseline="middle"
           {...Object.assign({}, labelStyle, label_style)}
           className="rp-label"
         >
-          {target.data.name.slice(0, maxLabelWidth)}
+          {nodeName.slice(0, maxLabelWidth)}
+        </text>
+      ) : null}
+      {isShowBranchLength ? (
+        <text
+          x={source_x + (target_x - source_x) / 2 - 20}
+          y={target_y - 8}
+          textAnchor="start"
+          alignmentBaseline="middle"
+          className="rp-label"
+        >
+          {parseFloat(target.data.attribute).toFixed(4)}
+        </text>
+      ) : null}
+      {supportValue ? (
+        <text
+          x={source_x + (target_x - source_x) / 2 - 13}
+          y={target_y + 15}
+          textAnchor="start"
+          alignmentBaseline="middle"
+          className="rp-label"
+        >
+          {supportValue.map((spVL: any) => {
+            if (spVL.isShowing && temp_name_array[spVL.index] !== undefined) {
+              const res = `${temp_name_array[spVL.index]}`;
+
+              if (isLeaf) return null;
+
+              if (firstEle) {
+                firstEle = false;
+
+                return res;
+              } else return "/" + res;
+            }
+
+            return null;
+          })}
         </text>
       ) : null}
     </g>

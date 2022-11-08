@@ -7,6 +7,7 @@ export interface IDropdownsMenuProps {
   reRootFunction: any;
   isLeaf?: boolean;
   toggleCollapse: any;
+  viewSubtree: any;
 }
 
 const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
@@ -17,6 +18,7 @@ const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
     isLeaf = false,
     reRootFunction,
     toggleCollapse,
+    viewSubtree,
   } = props;
 
   return (
@@ -39,6 +41,17 @@ const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
           }}
         >
           {currentNode.collapsed ? "Expand subtree" : "Collapse subtree"}
+        </a>
+      ) : null}
+      {currentNode && !isLeaf ? (
+        <a
+          className="dropdown-item"
+          tabIndex={-1}
+          onClick={() => {
+            viewSubtree(currentNode);
+          }}
+        >
+          Display subtree
         </a>
       ) : null}
       {currentNode ? (

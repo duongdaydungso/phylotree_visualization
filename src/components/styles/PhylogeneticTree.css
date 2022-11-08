@@ -20,3 +20,7 @@ text.rp-label {
 path.rp-branch:hover {
   stroke-width: 0.7em;
 }
+
+.dropdown-menu:hover {
+  cursor: pointer;
+}

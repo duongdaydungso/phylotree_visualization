@@ -248,6 +248,37 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     setDropdownsMenuState(null);
   };
 
+  const viewSubtree = (node: any) => {
+    console.log(node);
+    let posS = newickString.search(node.data.name);
+    let posE = newickString.search(node.data.name);
+
+    if (posS > 0)
+      if (newickString[posS - 1] === ")") {
+        let cnt = 1;
+        posS--;
+
+        while (posS > 0 && cnt > 0) {
+          posS--;
+
+          if (newickString[posS] === "(") cnt--;
+          else if (newickString[posS] === ")") cnt++;
+        }
+      }
+
+    while (
+      newickString[posE] !== "," &&
+      newickString[posE] !== ")" &&
+      newickString[posE] !== "("
+    )
+      posE++;
+
+    let result = newickString.substring(posS, posE);
+
+    setNewickString(result);
+    setDropdownsMenuState(null);
+  };
+
   const toggleCollapse = (node: any) => {
     let newCollapsedList: any;
 
@@ -393,6 +424,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
             currentNode={dropdownsMenuState.currentNode}
             reRootFunction={reRoot}
             toggleCollapse={toggleCollapse}
+            viewSubtree={viewSubtree}
             isLeaf={tree.isLeafNode(dropdownsMenuState.currentNode)}
           />
         ) : null}

@@ -1,6 +1,6 @@
 {
   "name": "phylotree-visualization-demo",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": false,
   "description": "A library used for visualizing phylotree.",
   "main": "dist/index.js",

@@ -173,13 +173,32 @@ function ShowInternalLabel({
   setIsShowInternalNode: any;
 }) {
   return (
-    <div className="toggle-internal-label">
+    <div className="toggle-checkbox">
       <input
         type="checkbox"
         onChange={(e) => setIsShowInternalNode(!isShowInternalNode)}
         checked={isShowInternalNode}
       />
       {!isShowInternalNode ? " Hide" : " Show"} internal labels
+    </div>
+  );
+}
+
+function ShowScale({
+  isShowScale,
+  setIsShowScale,
+}: {
+  isShowScale: boolean;
+  setIsShowScale: any;
+}) {
+  return (
+    <div className="toggle-checkbox">
+      <input
+        type="checkbox"
+        onChange={(e) => setIsShowScale(!isShowScale)}
+        checked={isShowScale}
+      />
+      {!isShowScale ? " Hide" : " Show"} scale bar
     </div>
   );
 }
@@ -276,6 +295,7 @@ export const PhylotreeVisualization: FunctionComponent<
   const [sort, setSort] = useState<string | null>(null);
   const [alignTips, setAlignTips] = useState<string>("left");
   const [isShowInternalNode, setIsShowInternalNode] = useState<boolean>(false);
+  const [isShowScale, setIsShowScale] = useState<boolean>(false);
   const [isShowLabel, setIsShowLabel] = useState<boolean>(true);
   const [isShowBranchLength, setIsShowBranchLength] = useState<boolean>(false);
   const [reloadState, setReloadState] = useState<boolean>(false);
@@ -291,6 +311,7 @@ export const PhylotreeVisualization: FunctionComponent<
     isShowInternalNode: false,
     isShowLabel: true,
     isShowBranchLength: false,
+    isShowScale: false,
     reloadState: true,
     searchingLabel: "",
   };
@@ -302,6 +323,7 @@ export const PhylotreeVisualization: FunctionComponent<
     setSort(baseStates.sort);
     setAlignTips(baseStates.alignTips);
     setIsShowInternalNode(baseStates.isShowInternalNode);
+    setIsShowScale(baseStates.isShowScale);
     setIsShowLabel(baseStates.isShowLabel);
     setIsShowBranchLength(baseStates.isShowBranchLength);
     setReloadState(baseStates.reloadState);
@@ -313,7 +335,9 @@ export const PhylotreeVisualization: FunctionComponent<
     if (!newickString) return;
 
     let pattern = /\/+[0-9]+:/g;
-    let result = newickString.replace(pattern, ":");
+    let tmpResult = newickString.replace(pattern, ":");
+
+    let result = tmpResult.replace("{highlight}", "");
 
     var blob = new Blob([result], {
       type: "text/plain;charset=utf-8",
@@ -449,6 +473,11 @@ export const PhylotreeVisualization: FunctionComponent<
             setIsShowInternalNode={setIsShowInternalNode}
           />
 
+          <ShowScale
+            isShowScale={isShowScale}
+            setIsShowScale={setIsShowScale}
+          />
+
           <ShowSearchLabel
             searchingLabel={searchingLabel}
             setSearchingLabel={setSearchingLabel}
@@ -472,8 +501,10 @@ export const PhylotreeVisualization: FunctionComponent<
           isShowInternalNode={isShowInternalNode}
           isShowLabel={isShowLabel}
           isShowBranchLength={isShowBranchLength}
+          isShowScale={isShowScale}
           labelStyler={labelStyler}
           supportValue={supportValue}
+          highlightBranches
         />
       ) : null}
     </div>

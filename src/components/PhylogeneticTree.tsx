@@ -5,6 +5,7 @@ import { phylotree } from "phylotree";
 import { max } from "d3-array";
 import { scaleLinear, scaleOrdinal } from "d3-scale";
 import { schemeCategory10 } from "d3-scale-chromatic";
+import { AxisTop } from "d3-react-axis";
 
 import Branch from "./branch";
 
@@ -208,6 +209,7 @@ export interface IPhylogeneticTreeProps {
   labelStyler?: any;
   tooltip?: any;
   supportValue: any;
+  isShowScale?: boolean;
 }
 
 const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
@@ -230,6 +232,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     branchStyler = null,
     labelStyler = null,
     supportValue,
+    isShowScale = false,
   } = props;
 
   const [tree, setTree] = useState<any>(new phylotree(newickString));
@@ -249,7 +252,6 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
   };
 
   const viewSubtree = (node: any) => {
-    console.log(node);
     let posS = newickString.search(node.data.name);
     let posE = newickString.search(node.data.name);
 
@@ -274,6 +276,27 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
       posE++;
 
     let result = newickString.substring(posS, posE);
+
+    setNewickString(result);
+    setDropdownsMenuState(null);
+  };
+
+  const toggleHighlightBranch = (node: any) => {
+    let pos = newickString.search(node.data.name);
+
+    pos += node.data.name.length;
+
+    let result = newickString;
+
+    if (newickString.substring(pos, pos + 11) === "{highlight}") {
+      result =
+        newickString.substring(0, pos) + newickString.substring(pos + 11);
+    } else if (newickString[pos] !== "{") {
+      result =
+        newickString.substring(0, pos) +
+        "{highlight}" +
+        newickString.substring(pos);
+    }
 
     setNewickString(result);
     setDropdownsMenuState(null);
@@ -376,42 +399,52 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
           <SVG
             id="svg-phylotree"
             width={width + 2 * padding}
-            height={height + 2 * padding}
+            height={height + 2 * padding + (isShowScale ? 60 : 0)}
           >
             <g transform={`translate(${padding}, ${padding})`}>
-              {tree.links.map((link: any) => {
-                const source_id = link.source.unique_id;
-                const target_id = link.target.unique_id;
-                const key = source_id + "," + target_id;
-                const show_label =
-                  isShowInternalNode ||
-                  (isShowLabel && tree.isLeafNode(link.target));
-                return (
-                  <Branch
-                    key={key}
-                    xScale={x_scale}
-                    yScale={y_scale}
-                    colorScale={color_scale}
-                    link={link}
-                    isShowLabel={show_label}
-                    isShowBranchLength={isShowBranchLength}
-                    maxLabelWidth={maxLabelWidth}
-                    width={width}
-                    alignTips={alignTips}
-                    branchStyler={branchStyler}
-                    labelStyler={labelStyler}
-                    tooltip={props.tooltip}
-                    setTooltip={setTooltip}
-                    onBranchClick={setDropdownsMenuState}
-                    supportValue={supportValue}
-                    isCollapsed={isInCollapsedList(collapsedList, link.target)}
-                    isLeaf={tree.isLeafNode(link.target)}
-                  />
-                );
-              })}
-              {tooltip ? (
-                <props.tooltip width={width} height={height} {...tooltip} />
+              {isShowScale ? (
+                <g>
+                  <AxisTop transform={`translate(0, 20)`} scale={x_scale} />
+                </g>
               ) : null}
+              <g transform={`translate(0, ${isShowScale ? 60 : 0})`}>
+                {tree.links.map((link: any) => {
+                  const source_id = link.source.unique_id;
+                  const target_id = link.target.unique_id;
+                  const key = source_id + "," + target_id;
+                  const show_label =
+                    isShowInternalNode ||
+                    (isShowLabel && tree.isLeafNode(link.target));
+                  return (
+                    <Branch
+                      key={key}
+                      xScale={x_scale}
+                      yScale={y_scale}
+                      colorScale={color_scale}
+                      link={link}
+                      isShowLabel={show_label}
+                      isShowBranchLength={isShowBranchLength}
+                      maxLabelWidth={maxLabelWidth}
+                      width={width}
+                      alignTips={alignTips}
+                      branchStyler={branchStyler}
+                      labelStyler={labelStyler}
+                      tooltip={props.tooltip}
+                      setTooltip={setTooltip}
+                      onBranchClick={setDropdownsMenuState}
+                      supportValue={supportValue}
+                      isCollapsed={isInCollapsedList(
+                        collapsedList,
+                        link.target
+                      )}
+                      isLeaf={tree.isLeafNode(link.target)}
+                    />
+                  );
+                })}
+                {tooltip ? (
+                  <props.tooltip width={width} height={height} {...tooltip} />
+                ) : null}
+              </g>
             </g>
           </SVG>
         </TransformComponent>
@@ -425,6 +458,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
             reRootFunction={reRoot}
             toggleCollapse={toggleCollapse}
             viewSubtree={viewSubtree}
+            toggleHighlightBranch={toggleHighlightBranch}
             isLeaf={tree.isLeafNode(dropdownsMenuState.currentNode)}
           />
         ) : null}

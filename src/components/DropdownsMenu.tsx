@@ -8,6 +8,7 @@ export interface IDropdownsMenuProps {
   isLeaf?: boolean;
   toggleCollapse: any;
   viewSubtree: any;
+  toggleHighlightBranch: any;
 }
 
 const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
@@ -19,6 +20,7 @@ const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
     reRootFunction,
     toggleCollapse,
     viewSubtree,
+    toggleHighlightBranch,
   } = props;
 
   return (
@@ -32,15 +34,15 @@ const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
         display: "block",
       }}
     >
-      {currentNode && !isLeaf ? (
+      {currentNode ? (
         <a
           className="dropdown-item"
           tabIndex={-1}
           onClick={() => {
-            toggleCollapse(currentNode);
+            toggleHighlightBranch(currentNode);
           }}
         >
-          {currentNode.collapsed ? "Expand subtree" : "Collapse subtree"}
+          Toggle highlight this branch
         </a>
       ) : null}
       {currentNode && !isLeaf ? (
@@ -52,6 +54,17 @@ const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
           }}
         >
           Display subtree
+        </a>
+      ) : null}
+      {currentNode && !isLeaf ? (
+        <a
+          className="dropdown-item"
+          tabIndex={-1}
+          onClick={() => {
+            toggleCollapse(currentNode);
+          }}
+        >
+          {currentNode.collapsed ? "Expand subtree" : "Collapse subtree"}
         </a>
       ) : null}
       {currentNode ? (

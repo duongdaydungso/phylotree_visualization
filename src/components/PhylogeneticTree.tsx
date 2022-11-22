@@ -7,7 +7,7 @@ import { scaleLinear, scaleOrdinal } from "d3-scale";
 import { schemeCategory10 } from "d3-scale-chromatic";
 import { AxisTop } from "d3-react-axis";
 
-import Branch from "./branch";
+import Branch from "../branch/branch";
 
 import "./styles/PhylogeneticTree.css";
 

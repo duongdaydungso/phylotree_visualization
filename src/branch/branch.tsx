@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from "react";
 
-import { line } from "d3-shape";
+import CollapsedPolygon from "./collapsedPolygon";
+import BranchLine from "./branchLine";
+import Label from "./label";
 
 export interface IBranchProps {
   key: any;
@@ -68,22 +70,6 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
   const tracer_x2 =
     alignTips == "right" ? width - (target.data.text_width || 0) : target_x;
 
-  const data: [number, number][] = [
-    [source_x, source_y],
-    [source_x, target_y],
-    [target_x, target_y],
-  ];
-
-  const collapsedPolygon: any = [
-    [target_x + 18, target_y + 10],
-    [target_x - 2, target_y],
-    [target_x + 18, target_y - 10],
-  ];
-
-  const branch_line = line()
-    .x((d: [number, number]) => d[0])
-    .y((d: [number, number]) => d[1]);
-
   const computed_branch_styles = branchStyler
     ? branchStyler(target.data)
     : target.data.annotation && colorScale
@@ -101,6 +87,8 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
   const label_style =
     target.data.name && labelStyler ? labelStyler(nodeName) : {};
 
+  const all_label_styles = Object.assign({}, labelStyle, label_style);
+
   let firstEle = true;
 
   if (target.hidden && !target.collapsed) return null;
@@ -108,58 +96,26 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
 
   return (
     <g className="node">
-      <path
-        className="rp-branch"
-        fill="none"
-        d={branch_line(data)}
-        {...all_branch_styles}
-        onMouseMove={
-          tooltip
-            ? (e) => {
-                setTooltip({
-                  x: e.nativeEvent.offsetX,
-                  y: e.nativeEvent.offsetY,
-                  data: target.data,
-                });
-              }
-            : undefined
-        }
-        onMouseOut={
-          tooltip
-            ? (e) => {
-                setTooltip(false);
-              }
-            : undefined
-        }
-        onClick={(e) => {
-          onBranchClick({
-            left: e.clientX + 20,
-            top: e.clientY - 20,
-            currentNode: target,
-          });
-        }}
+      <BranchLine
+        source_x={source_x}
+        source_y={source_y}
+        target_x={target_x}
+        target_y={target_y}
+        all_branch_styles={all_branch_styles}
+        data={target}
+        tooltip={tooltip}
+        setTooltip={setTooltip}
+        onBranchClick={onBranchClick}
       />
-      {isCollapsed && <polygon points={collapsedPolygon} fill="grey" />}
+      {isCollapsed && <CollapsedPolygon x={target_x} y={target_y} />}
       {isShowLabel ? (
-        <line
-          x1={target_x}
-          x2={tracer_x2}
-          y1={target_y}
-          y2={target_y}
-          className="rp-branch-tracer"
-        />
-      ) : null}
-      {isShowLabel ? (
-        <text
-          x={tracer_x2 + 20}
+        <Label
+          branch_x={target_x}
+          text_x={tracer_x2}
           y={target_y}
-          textAnchor="start"
-          alignmentBaseline="middle"
-          {...Object.assign({}, labelStyle, label_style)}
-          className="rp-label"
-        >
-          {nodeName.slice(0, maxLabelWidth)}
-        </text>
+          all_label_styles={all_label_styles}
+          node_name={nodeName.slice(0, maxLabelWidth)}
+        />
       ) : null}
       {isShowBranchLength ? (
         <text
@@ -199,14 +155,6 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
       ) : null}
     </g>
   );
-};
-
-Branch.defaultProps = {
-  branchStyle: {
-    strokeWidth: 2,
-    stroke: "grey",
-  },
-  labelStyle: {},
 };
 
 export default Branch;

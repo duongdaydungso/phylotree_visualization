@@ -1,6 +1,6 @@
 import React from "react";
 
-function Label({
+function BranchLabel({
   branch_x,
   text_x,
   y,
@@ -36,4 +36,4 @@ function Label({
   );
 }
 
-export default Label;
+export default BranchLabel;

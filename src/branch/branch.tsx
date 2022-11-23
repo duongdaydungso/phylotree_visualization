@@ -2,7 +2,9 @@ import React, { FunctionComponent } from "react";
 
 import CollapsedPolygon from "./collapsedPolygon";
 import BranchLine from "./branchLine";
-import Label from "./label";
+import BranchLabel from "./branchLabel";
+import BranchLength from "./branchLength";
+import SupportValue from "./supportValue";
 
 export interface IBranchProps {
   key: any;
@@ -89,8 +91,6 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
 
   const all_label_styles = Object.assign({}, labelStyle, label_style);
 
-  let firstEle = true;
-
   if (target.hidden && !target.collapsed) return null;
   if (target.data.name !== "root") if (target.parent.hidden) return null;
 
@@ -109,7 +109,7 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
       />
       {isCollapsed && <CollapsedPolygon x={target_x} y={target_y} />}
       {isShowLabel ? (
-        <Label
+        <BranchLabel
           branch_x={target_x}
           text_x={tracer_x2}
           y={target_y}
@@ -118,40 +118,19 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
         />
       ) : null}
       {isShowBranchLength ? (
-        <text
+        <BranchLength
           x={source_x + (target_x - source_x) / 2 - 20}
           y={target_y - 8}
-          textAnchor="start"
-          alignmentBaseline="middle"
-          className="rp-label"
-        >
-          {parseFloat(target.data.attribute).toFixed(4)}
-        </text>
+          len={parseFloat(target.data.attribute).toFixed(4)}
+        />
       ) : null}
-      {supportValue ? (
-        <text
+      {supportValue && !isLeaf ? (
+        <SupportValue
           x={source_x + (target_x - source_x) / 2 - 13}
           y={target_y + 15}
-          textAnchor="start"
-          alignmentBaseline="middle"
-          className="rp-label"
-        >
-          {supportValue.map((spVL: any) => {
-            if (spVL.isShowing && temp_name_array[spVL.index] !== undefined) {
-              const res = `${temp_name_array[spVL.index]}`;
-
-              if (isLeaf) return null;
-
-              if (firstEle) {
-                firstEle = false;
-
-                return res;
-              } else return "/" + res;
-            }
-
-            return null;
-          })}
-        </text>
+          supportValue={supportValue}
+          tempNameArray={temp_name_array}
+        />
       ) : null}
     </g>
   );

@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import PhylogeneticTree from "./PhylogeneticTree";
+import PhylogeneticTree from "../tree/PhylogeneticTree";
 
 import FileSaver from "file-saver";
 import saveSvgAsPng from "save-svg-as-png";

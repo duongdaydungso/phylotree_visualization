@@ -24,7 +24,7 @@ export interface IBranchProps {
   tooltip?: any;
   setTooltip?: any;
   onBranchClick?: any;
-  supportValue: any;
+  supportValue?: any;
   isCollapsed?: boolean;
   isLeaf: boolean;
 }

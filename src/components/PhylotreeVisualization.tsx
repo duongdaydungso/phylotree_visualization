@@ -4,6 +4,8 @@ import "./styles/PhylotreeVisualization.css";
 
 import PhylogeneticTree from "./tree/PhylogeneticTree";
 
+import FileSaver from "file-saver";
+
 function ShowSupportValue({
   supportValue,
   setSupportValue,
@@ -56,6 +58,10 @@ export interface IPhylotreeVisualizationProps {
   isShowLabel?: boolean;
   isShowBranchLength?: boolean;
   searchingLabel?: string;
+  isExportNewick?: boolean;
+  setIsExportNewick?: React.Dispatch<React.SetStateAction<boolean>>;
+  reloadState?: boolean;
+  setReloadState?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const PhylotreeVisualization: FunctionComponent<
@@ -87,31 +93,14 @@ export const PhylotreeVisualization: FunctionComponent<
   const [reloadState, setReloadState] = useState<boolean>(false);
 
   // Function
-  const resetNewickString = () => {
+  const resetState = () => {
     setNewickString("");
     setSupportValue(null);
     setNodeNum(0);
     setReloadState(true);
   };
 
-  const labelStyler = (nodeName: any) => {
-    if (searchingLabel !== "") {
-      var rx = new RegExp(searchingLabel, "i");
-
-      const identifier = nodeName.search(rx);
-
-      const fill = identifier !== -1 ? "red" : "black";
-
-      return { fill };
-    }
-  };
-
-  // Update
-  useEffect(() => {
-    resetNewickString();
-  }, [props.input, supportValueInput]);
-
-  useEffect(() => {
+  const initTree = () => {
     let tmp_newick = props.input.split("");
 
     let result_array = props.input.split("");
@@ -148,7 +137,51 @@ export const PhylotreeVisualization: FunctionComponent<
 
     setNodeNum(id / 2);
     setNewickString(result_newick);
+  };
 
+  const exportNewick = (filename?: string) => {
+    if (!newickString) return;
+
+    let pattern = /\/+[0-9]+:/g;
+    let tmpResult = newickString.replace(pattern, ":");
+
+    let result = tmpResult.replace("{highlight}", "");
+
+    var blob = new Blob([result], {
+      type: "text/plain;charset=utf-8",
+    });
+
+    const treefileName = filename ? filename : "phylotree.treefile";
+
+    FileSaver.saveAs(blob, treefileName);
+  };
+
+  const labelStyler = (nodeName: any) => {
+    if (searchingLabel !== "") {
+      var rx = new RegExp(searchingLabel, "i");
+
+      const identifier = nodeName.search(rx);
+
+      const fill = identifier !== -1 ? "red" : "black";
+
+      return { fill };
+    }
+  };
+
+  // Update
+  useEffect(() => {
+    resetState();
+  }, [props.input, supportValueInput]);
+
+  useEffect(() => {
+    if (props.reloadState && props.setReloadState) {
+      resetState();
+      props.setReloadState(false);
+    }
+  }, [props.reloadState]);
+
+  useEffect(() => {
+    initTree();
     setReloadState(false);
   }, [reloadState]);
 
@@ -158,6 +191,13 @@ export const PhylotreeVisualization: FunctionComponent<
       setHeight(nodeNum * heightPerNode + 2 * padding);
     }
   }, [nodeNum]);
+
+  useEffect(() => {
+    if (props.isExportNewick && props.setIsExportNewick) {
+      exportNewick();
+      props.setIsExportNewick(false);
+    }
+  }, [props.isExportNewick]);
 
   // Render
   return (

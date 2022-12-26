@@ -22,10 +22,20 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
   const [isShowLabel, setIsShowLabel] = useState<boolean>(true);
   const [isShowBranchLength, setIsShowBranchLength] = useState<boolean>(false);
   const [searchingLabel, setSearchingLabel] = useState<string>("");
+  const [isExportNewick, setIsExportNewick] = useState<boolean>(false);
+  const [reloadState, setReloadState] = useState<boolean>(false);
 
   return (
     <div>
       <div className="button-group">
+        <button
+          type="button"
+          onClick={() => {
+            setReloadState(true);
+          }}
+        >
+          Reload
+        </button>
         <button
           type="button"
           onClick={() => {
@@ -98,6 +108,14 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
         >
           Export image
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setIsExportNewick(true);
+          }}
+        >
+          Export newick
+        </button>
         <form onSubmit={(event) => event.preventDefault()}>
           <input
             type="text"
@@ -118,6 +136,10 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
         isShowLabel={isShowLabel}
         isShowBranchLength={isShowBranchLength}
         searchingLabel={searchingLabel}
+        isExportNewick={isExportNewick}
+        setIsExportNewick={setIsExportNewick}
+        reloadState={reloadState}
+        setReloadState={setReloadState}
       />
     </div>
   );

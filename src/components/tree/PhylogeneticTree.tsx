@@ -7,17 +7,15 @@ import { scaleLinear, scaleOrdinal } from "d3-scale";
 import { schemeCategory10 } from "d3-scale-chromatic";
 import { AxisTop } from "d3-react-axis";
 
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
 import Branch from "../branch/branch";
 
-import "./PhylogeneticTree.css";
-
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import "../styles/PhylogeneticTree.css";
 
 import SVG from "./svg";
 
-import DropdownsMenu, {
-  IDropdownsMenuProps,
-} from "./DropdownsMenu";
+import DropdownsMenu, { IDropdownsMenuProps } from "./DropdownsMenu";
 
 function accessor(node: any): number {
   return +node.data.attribute;

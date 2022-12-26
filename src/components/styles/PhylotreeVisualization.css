@@ -5,17 +5,8 @@
   padding: 20px;
 }
 
-.label-searching-form {
-  display: inline-block;
-}
-
 .tool-group {
   margin: 20px;
-}
-
-.tool-group-upper {
-  display: flex;
-  justify-content: space-between;
 }
 
 .tool-group-lower {
@@ -31,13 +22,4 @@
 .spValLabel {
   margin: 0 5px;
   display: flex;
-}
-
-.toggle-checkbox {
-  margin: auto 30px;
-}
-
-.label-searching-form-input {
-  height: 40px;
-  text-align: center;
 }

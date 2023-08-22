@@ -6,6 +6,8 @@ import PhylogeneticTree from "./tree/PhylogeneticTree";
 
 import FileSaver from "file-saver";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
 function ShowSupportValue({
   supportValue,
   setSupportValue,

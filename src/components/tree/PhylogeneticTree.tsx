@@ -442,7 +442,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                   );
                 })}
                 {tooltip ? (
-                  <props.tooltip width={width} height={height} {...tooltip} />
+                  <props.tooltip width={width} height={height} /> //{...tooltip} />
                 ) : null}
               </g>
             </g>

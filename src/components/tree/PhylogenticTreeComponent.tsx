@@ -8,6 +8,7 @@ const PhylogeneticTreeComponent: React.FunctionComponent<
   IPhylogeneticTreeComponentProps
 > = (props) => {
   const { tree } = props;
+  // TO DO: render the tree
 
   return <div>{tree.newickString}</div>;
 };

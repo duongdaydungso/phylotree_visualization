@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { PhylotreeVisualization, exportImage } from "./components";
+import PhylotreeVisualizationComponent from "./components/tree/PhylotreeVisualizationComponent";
 
 export interface IAppProps {}
 
@@ -141,6 +142,8 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
         reloadState={reloadState}
         setReloadState={setReloadState}
       />
+      <div>lmao</div>
+      <PhylotreeVisualizationComponent input={newick} />
     </div>
   );
 };

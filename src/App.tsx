@@ -48,6 +48,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
   // Extract species names from newick
   const species = newick
     .match(/\w+(?=:)/g)
+    // .match(/s\d+/g)
     ?.filter((name, index, self) => self.indexOf(name) === index);
 
   // Create metadata for each species

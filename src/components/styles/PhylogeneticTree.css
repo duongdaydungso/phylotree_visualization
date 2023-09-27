@@ -21,6 +21,27 @@ path.rp-branch:hover {
   stroke-width: 0.7em;
 }
 
+.dropdown-menu {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  position: absolute;
+  z-index: 1000;
+}
+
 .dropdown-menu:hover {
   cursor: pointer;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  display: block;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
 }

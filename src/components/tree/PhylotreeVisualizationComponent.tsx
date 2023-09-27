@@ -1,6 +1,7 @@
 import React from "react";
-import { usePhylogeneticTree } from "./usePhylogeneticTree";
+import { PhylogeneticTree, usePhylogeneticTree } from "./usePhylogeneticTree";
 import PhylogeneticTreeComponent from "./PhylogenticTreeComponent";
+import { PhylogenticTreeSettings } from "./phylogenticTreeSettings";
 
 export interface IPhylotreeVisualizationComponentProps {
   input: string;
@@ -11,11 +12,17 @@ const PhylotreeVisualizationComponent: React.FunctionComponent<
 > = (props) => {
   const { input } = props;
 
-  const tree = usePhylogeneticTree(input);
+  const tree: PhylogeneticTree = usePhylogeneticTree(input);
+  const treeSettings: PhylogenticTreeSettings = {
+    isAllowHighlightBranch: true,
+  };
 
   return (
     <div>
-      <PhylogeneticTreeComponent tree={tree}></PhylogeneticTreeComponent>
+      <PhylogeneticTreeComponent
+        tree={tree}
+        treeSettings={treeSettings}
+      ></PhylogeneticTreeComponent>
     </div>
   );
 };

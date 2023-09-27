@@ -1,15 +1,30 @@
 import { useState, useEffect } from "react";
+
 import { phylotree } from "phylotree";
 import { max } from "d3-array";
+import { scaleOrdinal } from "d3-scale";
+import { schemeCategory10 } from "d3-scale-chromatic";
 
 import { isInList } from "../utils/utils";
-import {
-  DIRECTION_ASCENDING,
-  DIRECTION_DEFAULT,
-  SHOW_INTERNAL_NODE_DEFAULT,
-} from "./phylogenticTreeConst";
+import { TREE_CONST } from "./phylogenticTreeConst";
 
-function usePhylogeneticTree(newickInitialInput: string = "") {
+export interface PhylogeneticTree {
+  newickString: string;
+  tree: any;
+  createTreeByNewick: (input: string) => void;
+  setNewickString: (input: string) => void;
+  reRoot: (node: any) => void;
+  viewSubtree: (node: any) => void;
+  toggleHighlightBranch: (node: any) => void;
+  toggleCollapse: (node: any) => void;
+  placeNodes: (isShowInternalNode?: boolean, sortOrder?: string) => void;
+  attachTextWidth: (maxLabelWidth?: number) => void;
+  getColorScale: () => any;
+}
+
+export function usePhylogeneticTree(
+  newickInitialInput: string = ""
+): PhylogeneticTree {
   // Attribute **************************************************************
   const [newickString, setNewickString] = useState<string>(newickInitialInput);
   const [tree, setTree] = useState<any>(
@@ -101,8 +116,8 @@ function usePhylogeneticTree(newickInitialInput: string = "") {
 
   // Place nodes in tree
   const placeNodes = (
-    isShowInternalNode: boolean = SHOW_INTERNAL_NODE_DEFAULT,
-    sort: string = DIRECTION_DEFAULT
+    isShowInternalNode: boolean = TREE_CONST.SHOW_INTERNAL_NODE_DEFAULT,
+    sortOrder: string = TREE_CONST.SORT_ORDER_DEFAULT
   ) => {
     if (tree.nodes.data.name === "new_root") return;
 
@@ -122,15 +137,15 @@ function usePhylogeneticTree(newickInitialInput: string = "") {
         n["count_depth"] = d;
       });
 
-      const asc = direction == DIRECTION_ASCENDING;
+      const asc = direction == TREE_CONST.SORT_ORDER_ASCENDING;
 
       tree.resortChildren(function (a: any, b: any) {
         return (a["count_depth"] - b["count_depth"]) * (asc ? 1 : -1);
       });
     }
 
-    if (sort) {
-      sortNodes(sort);
+    if (sortOrder) {
+      sortNodes(sortOrder);
     }
 
     // Collapse nodes in collapsed list
@@ -252,7 +267,9 @@ function usePhylogeneticTree(newickInitialInput: string = "") {
     }
   };
 
-  const attachTextWidth = (maxLabelWidth: number) => {
+  const attachTextWidth = (
+    maxLabelWidth: number = TREE_CONST.LABEL_WIDTH_MAX_DEFAULT
+  ) => {
     function attachTextWidthFnc(node: any) {
       function text_width(text: any, size: any, max_width: any): number {
         const width = Math.min(max_width, text.length);
@@ -265,6 +282,12 @@ function usePhylogeneticTree(newickInitialInput: string = "") {
     }
 
     attachTextWidthFnc(tree.nodes);
+  };
+
+  const getColorScale = () => {
+    return tree.parsed_tags
+      ? scaleOrdinal().domain(tree.parsed_tags).range(schemeCategory10)
+      : null;
   };
 
   // Update ****************************************************************
@@ -284,7 +307,6 @@ function usePhylogeneticTree(newickInitialInput: string = "") {
     toggleCollapse,
     placeNodes,
     attachTextWidth,
+    getColorScale,
   };
 }
-
-export { usePhylogeneticTree };

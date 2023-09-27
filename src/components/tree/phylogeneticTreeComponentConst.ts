@@ -1,0 +1,5 @@
+export const TREE_COMPONENT_CONST = {
+  // SIZE
+  WIDTH_DEFAULT: 500,
+  HEIGHT_DEFAULT: 500,
+};

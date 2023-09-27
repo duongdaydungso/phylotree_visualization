@@ -1,5 +1,15 @@
-export const DIRECTION_DEFAULT = "ascending";
-export const DIRECTION_ASCENDING = "ascending";
-export const DIRECTION_DESCENDING = "descending";
+export const TREE_CONST = {
+  // SORT
+  SORT_ORDER_DEFAULT: "ascending",
+  SORT_ORDER_ASCENDING: "ascending",
+  SORT_ORDER_DESCENDING: "descending",
 
-export const SHOW_INTERNAL_NODE_DEFAULT = false;
+  // SHOW INTERNAL NODE
+  SHOW_INTERNAL_NODE_DEFAULT: false,
+
+  // LABEL WIDTH
+  LABEL_WIDTH_MAX_DEFAULT: 20,
+
+  // HIGHLIGHT BRANCH
+  HIGHLIGHT_BRANCH_ALLOW_DEFAULT: false,
+};

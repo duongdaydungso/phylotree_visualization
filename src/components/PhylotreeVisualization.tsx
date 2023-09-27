@@ -48,10 +48,11 @@ function ShowSupportValue({
 
 export interface IPhylotreeVisualizationProps {
   input: string;
+  metadata?: Array<Object>;
   supportValueInput?: string;
   defaultWidth?: number;
   defaultHeight?: number;
-  sort?: string | null;
+  sort?: string;
   alignTips?: string;
   isShowInternalNode?: boolean;
   isShowScale?: boolean;
@@ -62,22 +63,25 @@ export interface IPhylotreeVisualizationProps {
   setIsExportNewick?: React.Dispatch<React.SetStateAction<boolean>>;
   reloadState?: boolean;
   setReloadState?: React.Dispatch<React.SetStateAction<boolean>>;
+  tooltip?: any;
 }
 
 export const PhylotreeVisualization: FunctionComponent<
   IPhylotreeVisualizationProps
 > = (props) => {
   const {
-    supportValueInput = null,
-    defaultWidth = null,
-    defaultHeight = null,
-    sort = null,
+    supportValueInput,
+    metadata,
+    defaultWidth,
+    defaultHeight,
+    sort,
     alignTips = "left",
     isShowInternalNode = false,
     isShowScale = false,
     isShowLabel = true,
     isShowBranchLength = false,
     searchingLabel = "",
+    tooltip,
   } = props;
 
   const padding = 20;
@@ -212,6 +216,7 @@ export const PhylotreeVisualization: FunctionComponent<
         <PhylogeneticTree
           newickString={newickString}
           setNewickString={setNewickString}
+          metadata={metadata}
           width={defaultWidth ? defaultWidth : width - 2 * padding}
           height={defaultHeight ? defaultHeight : height - 2 * padding}
           padding={padding}
@@ -224,6 +229,7 @@ export const PhylotreeVisualization: FunctionComponent<
           labelStyler={labelStyler}
           supportValue={supportValue}
           highlightBranches
+          tooltip={tooltip}
         />
       ) : null}
     </div>

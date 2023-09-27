@@ -195,6 +195,7 @@ function getColorScale(tree: any, highlightBranches: boolean | undefined) {
 export interface IPhylogeneticTreeProps {
   newickString: string;
   setNewickString: any;
+  metadata?: Array<Object>;
   width?: number;
   height?: number;
   padding?: number;
@@ -236,7 +237,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
   } = props;
 
   const [tree, setTree] = useState<any>(new phylotree(newickString));
-  const [tooltip, setTooltip] = useState(false);
+  const [tooltip, setTooltip] = useState<any>(false);
   const [collapsedList, setCollapsedList] = useState([]);
   const [dropdownsMenuState, setDropdownsMenuState] =
     useState<IDropdownsMenuProps | null>(null);
@@ -318,6 +319,32 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     setCollapsedList(newCollapsedList);
 
     setDropdownsMenuState(null);
+  };
+
+  const getMetadata = (node: any): Object | undefined => {
+    if (!props.metadata || !node) return undefined;
+
+    let nodeName: string = node.data.name;
+
+    const emptyNameInternalNodeRegex = /^\/[1-9][0-9]*$/;
+
+    const prefixRegex = /^(.*\/)[^/]*$/;
+
+    if (!emptyNameInternalNodeRegex.test(nodeName)) {
+      if (prefixRegex.test(nodeName)) {
+        nodeName = nodeName.replace(prefixRegex, "$1");
+
+        if (nodeName[nodeName.length - 1] === "/") {
+          nodeName = nodeName.slice(0, -1);
+        }
+      }
+    }
+
+    const metadata = props.metadata.find(
+      (element: any) => element.name === nodeName
+    );
+
+    return metadata ? metadata : undefined;
   };
 
   const handleClickOutsidedropdownsMenu = (event: any) => {
@@ -422,6 +449,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                       yScale={y_scale}
                       colorScale={color_scale}
                       link={link}
+                      metadata={getMetadata(link.target)}
                       isShowLabel={show_label}
                       isShowBranchLength={isShowBranchLength}
                       maxLabelWidth={maxLabelWidth}
@@ -429,7 +457,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                       alignTips={alignTips}
                       branchStyler={branchStyler}
                       labelStyler={labelStyler}
-                      tooltip={props.tooltip}
+                      tooltip={tooltip}
                       setTooltip={setTooltip}
                       onBranchClick={setDropdownsMenuState}
                       supportValue={supportValue}
@@ -441,25 +469,23 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
                     />
                   );
                 })}
-                {tooltip ? (
-                  <props.tooltip width={width} height={height} /> //{...tooltip} />
-                ) : null}
               </g>
             </g>
           </SVG>
         </TransformComponent>
       </TransformWrapper>
+      {tooltip ? <props.tooltip {...tooltip} /> : null}
       <div ref={dropdownsMenuContainer}>
         {dropdownsMenuState ? (
           <DropdownsMenu
-            left={dropdownsMenuState.left}
-            top={dropdownsMenuState.top}
-            currentNode={dropdownsMenuState.currentNode}
+            x={dropdownsMenuState.x}
+            y={dropdownsMenuState.y}
+            node={dropdownsMenuState.node}
             reRootFunction={reRoot}
             toggleCollapse={toggleCollapse}
             viewSubtree={viewSubtree}
             toggleHighlightBranch={toggleHighlightBranch}
-            isLeaf={tree.isLeafNode(dropdownsMenuState.currentNode)}
+            isLeaf={tree.isLeafNode(dropdownsMenuState.node)}
           />
         ) : null}
       </div>

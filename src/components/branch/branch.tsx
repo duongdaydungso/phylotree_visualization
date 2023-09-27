@@ -9,6 +9,7 @@ import SupportValue from "./supportValue";
 export interface IBranchProps {
   key: any;
   link: any;
+  metadata?: Object;
   xScale: any;
   yScale: any;
   colorScale: any;
@@ -33,6 +34,7 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
   // Destructure props
   const {
     link,
+    metadata,
     xScale,
     yScale,
     colorScale,
@@ -101,6 +103,7 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
         source_y={source_y}
         target_x={target_x}
         target_y={target_y}
+        metadata={metadata}
         all_branch_styles={all_branch_styles}
         data={target}
         tooltip={tooltip}

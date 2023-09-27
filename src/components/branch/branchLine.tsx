@@ -7,6 +7,7 @@ function BranchLine({
   source_y,
   target_x,
   target_y,
+  metadata,
   all_branch_styles,
   data,
   tooltip,
@@ -17,6 +18,7 @@ function BranchLine({
   source_y: number;
   target_x: number;
   target_y: number;
+  metadata?: Object;
   all_branch_styles: any;
   data: any;
   tooltip?: any;
@@ -39,29 +41,23 @@ function BranchLine({
       fill="none"
       d={branch_line(linePoint)}
       {...all_branch_styles}
-      onMouseMove={
-        tooltip
-          ? (e) => {
-              setTooltip({
-                x: e.nativeEvent.offsetX,
-                y: e.nativeEvent.offsetY,
-                data: data.data,
-              });
-            }
-          : undefined
-      }
-      onMouseOut={
-        tooltip
-          ? (e) => {
-              setTooltip(false);
-            }
-          : undefined
-      }
+      onMouseMove={(e) => {
+        setTooltip({
+          x: e.clientX,
+          y: e.clientY,
+          node: data,
+          metadata: metadata ? metadata : null,
+        });
+      }}
+      onMouseOut={(e) => {
+        setTooltip(false);
+      }}
       onClick={(e) => {
         onBranchClick({
-          left: e.clientX + 20,
-          top: e.clientY - 20,
-          currentNode: data,
+          x: e.clientX,
+          y: e.clientY,
+          node: data,
+          metadata: metadata ? metadata : null,
         });
       }}
     />

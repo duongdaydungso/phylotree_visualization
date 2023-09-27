@@ -2,7 +2,35 @@ import React, { useState } from "react";
 
 import { PhylotreeVisualization, exportImage } from "./components";
 
+import "./App.css";
+
 export interface IAppProps {}
+
+function showToolTip(tooltipData: any) {
+  const { x, y, node, metadata } = tooltipData;
+
+  if (!node && !metadata) return null;
+
+  return (
+    <div
+      className="tooltip-container"
+      style={{
+        left: x + 20,
+        top: y - 20,
+      }}
+    >
+      {node && <div className="tooltip-title">{node.data.name}</div>}
+      {metadata && (
+        <div className="tooltip-content">
+          <div>Color: {metadata.color}</div>
+          <div>Shape: {metadata.shape}</div>
+          <div>Size: {metadata.size}</div>
+          <div>Label: {metadata.label}</div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const App: React.FunctionComponent<IAppProps> = (props) => {
   const newick =
@@ -15,7 +43,27 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
 
   //   const newick = "(A:1,(B:1,C:1):1,(D:1,(E:1,F:1):1):1);";
 
-  const [sort, setSort] = useState<string | null>(null);
+  const metadata: Array<Object> = [];
+
+  // Extract species names from newick
+  const species = newick
+    .match(/\w+(?=:)/g)
+    ?.filter((name, index, self) => self.indexOf(name) === index);
+
+  // Create metadata for each species
+  if (species) {
+    species.forEach((name) => {
+      metadata.push({
+        name,
+        color: "green",
+        shape: "square",
+        size: 8,
+        label: name,
+      });
+    });
+  }
+
+  const [sort, setSort] = useState<string>();
   const [alignTips, setAlignTips] = useState<string>("left");
   const [isShowInternalNode, setIsShowInternalNode] = useState<boolean>(false);
   const [isShowScale, setIsShowScale] = useState<boolean>(false);
@@ -129,6 +177,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
       </div>
       <PhylotreeVisualization
         input={newick}
+        metadata={metadata}
         sort={sort}
         alignTips={alignTips}
         isShowInternalNode={isShowInternalNode}
@@ -140,6 +189,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
         setIsExportNewick={setIsExportNewick}
         reloadState={reloadState}
         setReloadState={setReloadState}
+        tooltip={showToolTip}
       />
     </div>
   );

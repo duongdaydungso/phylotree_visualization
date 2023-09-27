@@ -1,9 +1,9 @@
 import React, { FunctionComponent } from "react";
 
 export interface IDropdownsMenuProps {
-  left: number;
-  top: number;
-  currentNode: any;
+  x: number;
+  y: number;
+  node: any;
   reRootFunction: any;
   isLeaf?: boolean;
   toggleCollapse: any;
@@ -13,9 +13,9 @@ export interface IDropdownsMenuProps {
 
 const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
   const {
-    left = 0,
-    top = 0,
-    currentNode = null,
+    x = 0,
+    y = 0,
+    node = null,
     isLeaf = false,
     reRootFunction,
     toggleCollapse,
@@ -28,51 +28,51 @@ const DropdownsMenu: FunctionComponent<IDropdownsMenuProps> = (props) => {
       className="dropdown-menu"
       role="menu"
       style={{
-        left,
-        top,
+        left: x + 20,
+        top: y - 20,
         position: "fixed",
         display: "block",
       }}
     >
-      {currentNode ? (
+      {node ? (
         <a
           className="dropdown-item"
           tabIndex={-1}
           onClick={() => {
-            toggleHighlightBranch(currentNode);
+            toggleHighlightBranch(node);
           }}
         >
           Toggle highlight this branch
         </a>
       ) : null}
-      {currentNode && !isLeaf ? (
+      {node && !isLeaf ? (
         <a
           className="dropdown-item"
           tabIndex={-1}
           onClick={() => {
-            viewSubtree(currentNode);
+            viewSubtree(node);
           }}
         >
           Display subtree
         </a>
       ) : null}
-      {currentNode && !isLeaf ? (
+      {node && !isLeaf ? (
         <a
           className="dropdown-item"
           tabIndex={-1}
           onClick={() => {
-            toggleCollapse(currentNode);
+            toggleCollapse(node);
           }}
         >
-          {currentNode.collapsed ? "Expand subtree" : "Collapse subtree"}
+          {node.collapsed ? "Expand subtree" : "Collapse subtree"}
         </a>
       ) : null}
-      {currentNode ? (
+      {node ? (
         <a
           className="dropdown-item"
           tabIndex={-1}
           onClick={() => {
-            reRootFunction(currentNode);
+            reRootFunction(node);
           }}
         >
           Reroot on this node

@@ -89,7 +89,7 @@ const Branch: FunctionComponent<IBranchProps> = (props) => {
   );
 
   const label_style =
-    target.data.name && labelStyler ? labelStyler(nodeName) : {};
+    target.data.name && labelStyler ? labelStyler(target, metadata) : {};
 
   const all_label_styles = Object.assign({}, labelStyle, label_style);
 

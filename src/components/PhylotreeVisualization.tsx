@@ -58,7 +58,7 @@ export interface IPhylotreeVisualizationProps {
   isShowScale?: boolean;
   isShowLabel?: boolean;
   isShowBranchLength?: boolean;
-  searchingLabel?: string;
+  searchingFilter?: Array<{ key: string; value: string }>;
   isExportNewick?: boolean;
   setIsExportNewick?: React.Dispatch<React.SetStateAction<boolean>>;
   reloadState?: boolean;
@@ -80,7 +80,7 @@ export const PhylotreeVisualization: FunctionComponent<
     isShowScale = false,
     isShowLabel = true,
     isShowBranchLength = false,
-    searchingLabel = "",
+    searchingFilter,
     tooltip,
   } = props;
 
@@ -160,16 +160,46 @@ export const PhylotreeVisualization: FunctionComponent<
     FileSaver.saveAs(blob, treefileName);
   };
 
-  const labelStyler = (nodeName: any) => {
-    if (searchingLabel !== "") {
-      var rx = new RegExp(searchingLabel, "i");
+  const labelStyler = (node: any, metadata: any) => {
+    if (!searchingFilter || !node) return undefined;
 
-      const identifier = nodeName.search(rx);
+    for (let i = 0; i < searchingFilter.length; i++) {
+      const filter = searchingFilter[i];
 
-      const fill = identifier !== -1 ? "red" : "black";
+      if (filter.key === "name") {
+        if (filter.value !== "") {
+          let nodeName: string = node.data.name;
 
-      return { fill };
+          const emptyNameInternalNodeRegex = /^\/[1-9][0-9]*$/;
+
+          const prefixRegex = /^(.*\/)[^/]*$/;
+
+          if (!emptyNameInternalNodeRegex.test(nodeName)) {
+            if (prefixRegex.test(nodeName)) {
+              nodeName = nodeName.replace(prefixRegex, "$1");
+
+              if (nodeName[nodeName.length - 1] === "/") {
+                nodeName = nodeName.slice(0, -1);
+              }
+            }
+          }
+
+          var rx = new RegExp(filter.value, "i");
+
+          const identifier = nodeName.search(rx);
+
+          if (identifier == -1) return undefined;
+        }
+
+        continue;
+      }
+
+      if (!metadata) return undefined;
+
+      if (metadata[filter.key] !== filter.value) return undefined;
     }
+
+    return { fill: "red" };
   };
 
   // Update

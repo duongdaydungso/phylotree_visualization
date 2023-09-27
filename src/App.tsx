@@ -56,7 +56,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
     species.forEach((name) => {
       metadata.push({
         name,
-        color: "green",
+        color: name.length % 2 == 0 ? "green" : "yellow",
         shape: "square",
         size: 8,
         label: name,
@@ -70,7 +70,9 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
   const [isShowScale, setIsShowScale] = useState<boolean>(false);
   const [isShowLabel, setIsShowLabel] = useState<boolean>(true);
   const [isShowBranchLength, setIsShowBranchLength] = useState<boolean>(false);
-  const [searchingLabel, setSearchingLabel] = useState<string>("");
+  const [searchingFilter, setSearchingFilter] = useState<
+    Array<{ key: string; value: string }>
+  >([{ key: "name", value: "" }]);
   const [isExportNewick, setIsExportNewick] = useState<boolean>(false);
   const [reloadState, setReloadState] = useState<boolean>(false);
 
@@ -166,14 +168,50 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
           Export newick
         </button>
         <form onSubmit={(event) => event.preventDefault()}>
-          <input
-            type="text"
-            placeholder="Search tree"
-            value={searchingLabel}
-            onChange={(event) => {
-              setSearchingLabel(event.target.value);
+          {searchingFilter.map((filter, index) => (
+            <div key={index}>
+              <input
+                type="text"
+                placeholder="Key"
+                value={filter.key}
+                onChange={(event) => {
+                  const newFilter = [...searchingFilter];
+                  newFilter[index].key = event.target.value;
+                  setSearchingFilter(newFilter);
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Value"
+                value={filter.value}
+                onChange={(event) => {
+                  const newFilter = [...searchingFilter];
+                  newFilter[index].value = event.target.value;
+                  setSearchingFilter(newFilter);
+                }}
+              />
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newFilter = [...searchingFilter];
+                    newFilter.splice(index, 1);
+                    setSearchingFilter(newFilter);
+                  }}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              setSearchingFilter([...searchingFilter, { key: "", value: "" }]);
             }}
-          />
+          >
+            Add filter
+          </button>
         </form>
       </div>
       <PhylotreeVisualization
@@ -185,12 +223,12 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
         isShowScale={isShowScale}
         isShowLabel={isShowLabel}
         isShowBranchLength={isShowBranchLength}
-        searchingLabel={searchingLabel}
         isExportNewick={isExportNewick}
         setIsExportNewick={setIsExportNewick}
         reloadState={reloadState}
         setReloadState={setReloadState}
         tooltip={showToolTip}
+        searchingFilter={searchingFilter}
       />
     </div>
   );

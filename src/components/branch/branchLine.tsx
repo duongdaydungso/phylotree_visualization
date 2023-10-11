@@ -42,15 +42,16 @@ function BranchLine({
       d={branch_line(linePoint)}
       {...all_branch_styles}
       onMouseMove={(e) => {
-        setTooltip({
-          x: e.clientX,
-          y: e.clientY,
-          node: data,
-          metadata: metadata ? metadata : null,
-        });
+        if (setTooltip)
+          setTooltip({
+            x: e.clientX,
+            y: e.clientY,
+            node: data,
+            metadata: metadata ? metadata : null,
+          });
       }}
       onMouseOut={(e) => {
-        setTooltip(false);
+        if (setTooltip) setTooltip(false);
       }}
       onClick={(e) => {
         onBranchClick({

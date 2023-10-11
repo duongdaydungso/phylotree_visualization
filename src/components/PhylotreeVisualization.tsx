@@ -49,7 +49,7 @@ function ShowSupportValue({
 export interface IPhylotreeVisualizationProps {
   input: string;
   metadata?: Array<Object>;
-  supportValueInput?: string;
+  supportValueInput?: string | boolean;
   defaultWidth?: number;
   defaultHeight?: number;
   sort?: string;
@@ -121,22 +121,55 @@ export const PhylotreeVisualization: FunctionComponent<
     const result_newick = tmp_newick.join("");
 
     if (supportValueInput) {
-      const tempSPVLArray = supportValueInput.split("/");
+      if (typeof supportValueInput === "string") {
+        const tempSPVLArray = supportValueInput.split("/");
 
-      let resArray = new Array();
-      let tmpCNT = 0;
+        let resArray = new Array();
+        let tmpCNT = 0;
 
-      tempSPVLArray.forEach((tmp) => {
-        resArray.push({
-          supportValue: tmp,
-          isShowing: false,
-          index: tmpCNT,
+        tempSPVLArray.forEach((tmp) => {
+          resArray.push({
+            supportValue: tmp,
+            isShowing: false,
+            index: tmpCNT,
+          });
+
+          tmpCNT++;
         });
 
-        tmpCNT++;
-      });
+        setSupportValue(resArray);
+      } else {
+        const extractFieldNames = (metadata: any) => {
+          if (!metadata) {
+            return [];
+          }
 
-      setSupportValue(resArray);
+          if (!metadata[0].supportValue) {
+            return [];
+          }
+
+          const fieldNames = Object.keys(metadata[0].supportValue);
+
+          return fieldNames;
+        };
+
+        const tempSPVLArray = extractFieldNames(metadata);
+
+        let resArray = new Array();
+        let tmpCNT = 0;
+
+        tempSPVLArray.forEach((tmp) => {
+          resArray.push({
+            supportValue: tmp,
+            isShowing: false,
+            index: tmpCNT,
+          });
+
+          tmpCNT++;
+        });
+
+        setSupportValue(resArray);
+      }
     } else setSupportValue(null);
 
     setNodeNum(id / 2);
@@ -163,11 +196,15 @@ export const PhylotreeVisualization: FunctionComponent<
   const labelStyler = (node: any, metadata: any) => {
     if (!searchingFilter || !node) return undefined;
 
+    let allFilterAreEmpty = true;
+
     for (let i = 0; i < searchingFilter.length; i++) {
       const filter = searchingFilter[i];
 
       if (filter.key === "name") {
         if (filter.value !== "") {
+          allFilterAreEmpty = false;
+
           let nodeName: string = node.data.name;
 
           const emptyNameInternalNodeRegex = /^\/[1-9][0-9]*$/;
@@ -196,8 +233,14 @@ export const PhylotreeVisualization: FunctionComponent<
 
       if (!metadata) return undefined;
 
-      if (metadata[filter.key] !== filter.value) return undefined;
+      if (filter.value !== "") {
+        allFilterAreEmpty = false;
+
+        if (metadata[filter.key] !== filter.value) return undefined;
+      }
     }
+
+    if (allFilterAreEmpty) return undefined;
 
     return { fill: "red" };
   };

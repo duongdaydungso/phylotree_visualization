@@ -5,6 +5,7 @@
   "description": "A library used for visualizing phylotree.",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "homepage": "https://duongdaydungso.github.io/phylotree_visualization",
   "file": [
     "/dist"
   ],
@@ -14,27 +15,18 @@
     "clean": "rimraf dist",
     "copy-files": "copyfiles -u 3 -E **/styles/**.css dist/components/styles",
     "prepare": "npm run build",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "predeploy": "react-scripts build",
+    "deploy": "gh-pages -d build"
   },
   "author": "nktd",
   "license": "MIT",
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/preset-env": "^7.22.20",
-    "@babel/preset-react": "^7.22.15",
-    "@babel/preset-typescript": "^7.23.0",
     "@storybook/addon-essentials": "^7.4.6",
-    "@storybook/addon-interactions": "^7.4.6",
-    "@storybook/addon-links": "^7.4.6",
-    "@storybook/addon-onboarding": "^1.0.8",
-    "@storybook/blocks": "^7.4.6",
-    "@storybook/react": "^7.4.6",
-    "@storybook/react-webpack5": "^7.4.6",
-    "@storybook/testing-library": "^0.2.2",
     "@types/node": "^17.0.23",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
+    "gh-pages": "^6.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "^5.0.1",

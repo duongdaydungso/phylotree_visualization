@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/phylotree_visualization/static/css/main.50a81624.css",
+    "main.js": "/phylotree_visualization/static/js/main.667b93ef.js",
+    "index.html": "/phylotree_visualization/index.html",
+    "main.50a81624.css.map": "/phylotree_visualization/static/css/main.50a81624.css.map",
+    "main.667b93ef.js.map": "/phylotree_visualization/static/js/main.667b93ef.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.50a81624.css",
+    "static/js/main.667b93ef.js"
+  ]
+}

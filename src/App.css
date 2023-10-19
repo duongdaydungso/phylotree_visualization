@@ -1,14 +1,19 @@
+/* App.css */
+
+/* Tooltip styles */
 .tooltip-container {
   position: fixed;
   display: block;
-  background-color: #fff;
+  background-color: #ffffff;
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 5px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   font-family: Arial, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   z-index: 1000;
+  max-width: 300px;
+  text-align: left;
 }
 
 .tooltip-title {
@@ -22,4 +27,61 @@
 
 .tooltip-content > div {
   margin-bottom: 5px;
+}
+
+/* Button group styles */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.button-group button {
+  background-color: #0074d9;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button-group button:hover {
+  background-color: #0056a1;
+}
+
+/* Form and input styles */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Add filter button styles */
+.add-filter-button {
+  background-color: #0074d9;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  max-width: 100px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.add-filter-button:hover {
+  background-color: #0056a1;
 }

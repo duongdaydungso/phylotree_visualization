@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/phylotree_visualization/static/css/main.50a81624.css",
-    "main.js": "/phylotree_visualization/static/js/main.667b93ef.js",
+    "main.css": "/phylotree_visualization/static/css/main.8a34ce70.css",
+    "main.js": "/phylotree_visualization/static/js/main.59c5254a.js",
     "index.html": "/phylotree_visualization/index.html",
-    "main.50a81624.css.map": "/phylotree_visualization/static/css/main.50a81624.css.map",
-    "main.667b93ef.js.map": "/phylotree_visualization/static/js/main.667b93ef.js.map"
+    "main.8a34ce70.css.map": "/phylotree_visualization/static/css/main.8a34ce70.css.map",
+    "main.59c5254a.js.map": "/phylotree_visualization/static/js/main.59c5254a.js.map"
   },
   "entrypoints": [
-    "static/css/main.50a81624.css",
-    "static/js/main.667b93ef.js"
+    "static/css/main.8a34ce70.css",
+    "static/js/main.59c5254a.js"
   ]
 }

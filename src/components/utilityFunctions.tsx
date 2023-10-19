@@ -1,3 +1,4 @@
+import saveAs from "file-saver";
 import saveSvgAsPng from "save-svg-as-png";
 
 export function exportImage(filename?: string) {
@@ -14,4 +15,11 @@ export function exportImage(filename?: string) {
   const imageName = filename ? filename : "phylotree.png";
 
   saveSvgAsPng.saveSvgAsPng(tempSourceElement, imageName, imageOptions);
+}
+
+export function exportMetadata(metadata: any, filename?: string) {
+  const metadataString = JSON.stringify(metadata, null, 2);
+  const blob = new Blob([metadataString], { type: "application/json" });
+  const metadataName = filename ? filename : "metadata.json";
+  saveAs(blob, metadataName);
 }

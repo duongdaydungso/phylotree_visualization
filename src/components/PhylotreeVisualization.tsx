@@ -49,6 +49,7 @@ function ShowSupportValue({
 export interface IPhylotreeVisualizationProps {
   input: string;
   metadata?: Array<Object>;
+  setMetadata?: React.Dispatch<React.SetStateAction<Array<Object>>>;
   supportValueInput?: string | boolean;
   defaultWidth?: number;
   defaultHeight?: number;
@@ -236,7 +237,8 @@ export const PhylotreeVisualization: FunctionComponent<
       if (filter.value !== "") {
         allFilterAreEmpty = false;
 
-        if (metadata[filter.key] !== filter.value) return undefined;
+        if (metadata[filter.key.toLowerCase()] !== filter.value)
+          return undefined;
       }
     }
 
@@ -290,6 +292,7 @@ export const PhylotreeVisualization: FunctionComponent<
           newickString={newickString}
           setNewickString={setNewickString}
           metadata={metadata}
+          setMetadata={props.setMetadata}
           width={defaultWidth ? defaultWidth : width - 2 * padding}
           height={defaultHeight ? defaultHeight : height - 2 * padding}
           padding={padding}

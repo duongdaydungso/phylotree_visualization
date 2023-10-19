@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 
-import { PhylotreeVisualization, exportImage } from "./components";
+import {
+  PhylotreeVisualization,
+  exportImage,
+  exportMetadata,
+} from "./components";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,6 +12,9 @@ import {
   faSortAmountUp,
   faAlignRight,
   faAlignLeft,
+  faImage,
+  faFileExport,
+  faDatabase,
 } from "@fortawesome/free-solid-svg-icons";
 
 import "./App.css";
@@ -34,11 +41,41 @@ function showToolTip(tooltipData: any) {
           <div>Shape: {metadata.shape}</div>
           <div>Size: {metadata.size}</div>
           <div>Label: {metadata.label}</div>
+          {metadata.annotation && <div>Annotation: {metadata.annotation}</div>}
         </div>
       )}
     </div>
   );
 }
+
+const Switch = ({
+  id,
+  isOn,
+  handleToggle,
+}: {
+  id: string;
+  isOn: boolean;
+  handleToggle: any;
+}) => {
+  return (
+    <>
+      <input
+        checked={isOn}
+        onChange={handleToggle}
+        className="react-switch-checkbox"
+        id={id}
+        type="checkbox"
+      />
+      <label
+        className="react-switch-label"
+        style={{ background: isOn ? "#06D6A0" : undefined }}
+        htmlFor={id}
+      >
+        <span className={`react-switch-button`} />
+      </label>
+    </>
+  );
+};
 
 const App: React.FunctionComponent<IAppProps> = (props) => {
   //   const newick =
@@ -86,6 +123,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
   >([{ key: "name", value: "" }]);
   const [isExportNewick, setIsExportNewick] = useState<boolean>(false);
   const [reloadState, setReloadState] = useState<boolean>(false);
+  const [treeMetadata, setTreeMetadata] = useState<Array<Object>>(metadata);
 
   useEffect(() => {
     setSort("ascending");
@@ -98,169 +136,218 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
   }, [reloadState]);
 
   return (
-    <div>
-      <div className="button-group">
-        <button
-          type="button"
-          onClick={() => {
-            setReloadState(true);
-          }}
-          title="Reload"
-        >
-          <FontAwesomeIcon icon={faRotateRight} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setSort("ascending");
-          }}
-          title="Sort ascending"
-        >
-          <FontAwesomeIcon icon={faSortAmountUp} flip="vertical" />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setSort("descending");
-          }}
-          title="Sort descending"
-        >
-          <FontAwesomeIcon icon={faSortAmountUp} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setAlignTips("left");
-          }}
-          title="Align tips left"
-        >
-          <FontAwesomeIcon icon={faAlignLeft} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setAlignTips("right");
-          }}
-          title="Align tips right"
-        >
-          <FontAwesomeIcon icon={faAlignRight} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setIsShowInternalNode(!isShowInternalNode);
-          }}
-        >
-          {isShowInternalNode ? "Hide internal node" : "Show internal node"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setIsShowLabel(!isShowLabel);
-          }}
-        >
-          {isShowLabel ? "Hide label" : "Show label"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setIsShowScale(!isShowScale);
-          }}
-        >
-          {isShowScale ? "Hide scale" : "Show scale"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setIsShowBranchLength(!isShowBranchLength);
-          }}
-        >
-          {isShowBranchLength ? "Hide branch length" : "Show branch length"}
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            exportImage();
-          }}
-        >
-          Export image
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setIsExportNewick(true);
-          }}
-        >
-          Export newick
-        </button>
+    <div className="tree-visualization">
+      <div className="view-option">
+        <div className="option-group">
+          <div className="button-group">
+            <button
+              type="button"
+              onClick={() => {
+                setReloadState(true);
+              }}
+              title="Reload"
+            >
+              <FontAwesomeIcon icon={faRotateRight} />
+              <span> </span>
+              Reload
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSort("ascending");
+              }}
+              title="Sort ascending"
+            >
+              <FontAwesomeIcon icon={faSortAmountUp} flip="vertical" />
+              <span> </span>
+              Sort ascending
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSort("descending");
+              }}
+              title="Sort descending"
+            >
+              <FontAwesomeIcon icon={faSortAmountUp} />
+              <span> </span>
+              Sort descending
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAlignTips("left");
+              }}
+              title="Align tips left"
+            >
+              <FontAwesomeIcon icon={faAlignLeft} />
+              <span> </span>
+              Align tips left
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAlignTips("right");
+              }}
+              title="Align tips right"
+            >
+              <FontAwesomeIcon icon={faAlignRight} />
+              <span> </span>
+              Align tips right
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                exportImage();
+              }}
+              title="Export image"
+            >
+              <FontAwesomeIcon icon={faImage} />
+              <span> </span>
+              Export image
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsExportNewick(true);
+              }}
+              title="Export newick"
+            >
+              <FontAwesomeIcon icon={faFileExport} />
+              <span> </span>
+              Export newick
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                exportMetadata(treeMetadata, "metadata.json");
+              }}
+              title="Export metadata"
+            >
+              <FontAwesomeIcon icon={faDatabase} />
+              <span> </span>
+              Export metadata
+            </button>
+          </div>
+          <div className="switch-group">
+            <div className="switch-item">
+              <label htmlFor="react-switch-new-internal-node">
+                Internal node:
+              </label>
+              <Switch
+                id={"react-switch-new-internal-node"}
+                isOn={isShowInternalNode}
+                handleToggle={() => setIsShowInternalNode(!isShowInternalNode)}
+              />
+            </div>
+
+            <div className="switch-item">
+              <label htmlFor="react-switch-new-label">Label:</label>
+              <Switch
+                id={"react-switch-new-label"}
+                isOn={isShowLabel}
+                handleToggle={() => setIsShowLabel(!isShowLabel)}
+              />
+            </div>
+
+            <div className="switch-item">
+              <label htmlFor="react-switch-new-scale">Scale:</label>
+              <Switch
+                id={"react-switch-new-scale"}
+                isOn={isShowScale}
+                handleToggle={() => setIsShowScale(!isShowScale)}
+              />
+            </div>
+
+            <div className="switch-item">
+              <label htmlFor="react-switch-new-branch-length">
+                Branch length:
+              </label>
+              <Switch
+                id={"react-switch-new-branch-length"}
+                isOn={isShowBranchLength}
+                handleToggle={() => setIsShowBranchLength(!isShowBranchLength)}
+              />
+            </div>
+          </div>
+        </div>
+        <PhylotreeVisualization
+          input={newick}
+          metadata={treeMetadata}
+          setMetadata={setTreeMetadata}
+          supportValueInput
+          sort={sort}
+          alignTips={alignTips}
+          isShowInternalNode={isShowInternalNode}
+          isShowScale={isShowScale}
+          isShowLabel={isShowLabel}
+          isShowBranchLength={isShowBranchLength}
+          isExportNewick={isExportNewick}
+          setIsExportNewick={setIsExportNewick}
+          reloadState={reloadState}
+          setReloadState={setReloadState}
+          tooltip={showToolTip}
+          searchingFilter={searchingFilter}
+        />
       </div>
-      <form onSubmit={(event) => event.preventDefault()}>
-        {searchingFilter.map((filter, index) => (
-          <div key={index}>
-            {index > 0 ? (
+      <div className="filter-group">
+        <div className="filter-title">Filter</div>
+        <form onSubmit={(event) => event.preventDefault()}>
+          {searchingFilter.map((filter, index) => (
+            <div key={index} className="filter-field">
+              {index > 0 ? (
+                <input
+                  className="filter-key"
+                  type="text"
+                  placeholder="Key"
+                  value={filter.key}
+                  onChange={(event) => {
+                    const newFilter = [...searchingFilter];
+                    newFilter[index].key = event.target.value;
+                    setSearchingFilter(newFilter);
+                  }}
+                />
+              ) : (
+                <div className="filter-name">Name</div>
+              )}
               <input
+                className="filter-value"
                 type="text"
-                placeholder="Key"
-                value={filter.key}
+                placeholder="Value"
+                value={filter.value}
                 onChange={(event) => {
                   const newFilter = [...searchingFilter];
-                  newFilter[index].key = event.target.value;
+                  newFilter[index].value = event.target.value;
                   setSearchingFilter(newFilter);
                 }}
               />
-            ) : (
-              <div>Name</div>
-            )}
-            <input
-              type="text"
-              placeholder="Value"
-              value={filter.value}
-              onChange={(event) => {
-                const newFilter = [...searchingFilter];
-                newFilter[index].value = event.target.value;
-                setSearchingFilter(newFilter);
-              }}
-            />
-            {index > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  const newFilter = [...searchingFilter];
-                  newFilter.splice(index, 1);
-                  setSearchingFilter(newFilter);
-                }}
-              >
-                Delete
-              </button>
-            )}
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => {
-            setSearchingFilter([...searchingFilter, { key: "", value: "" }]);
-          }}
-        >
-          Add filter
-        </button>
-      </form>
-      <PhylotreeVisualization
-        input={newick}
-        metadata={metadata}
-        supportValueInput
-        sort={sort}
-        alignTips={alignTips}
-        isShowInternalNode={isShowInternalNode}
-        isShowScale={isShowScale}
-        isShowLabel={isShowLabel}
-        isShowBranchLength={isShowBranchLength}
-        isExportNewick={isExportNewick}
-        setIsExportNewick={setIsExportNewick}
-        reloadState={reloadState}
-        setReloadState={setReloadState}
-        tooltip={showToolTip}
-        searchingFilter={searchingFilter}
-      />
+              {index > 0 && (
+                <button
+                  className="delete-filter-button"
+                  type="button"
+                  onClick={() => {
+                    const newFilter = [...searchingFilter];
+                    newFilter.splice(index, 1);
+                    setSearchingFilter(newFilter);
+                  }}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            className="add-filter-button"
+            type="button"
+            onClick={() => {
+              setSearchingFilter([...searchingFilter, { key: "", value: "" }]);
+            }}
+          >
+            Add filter
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

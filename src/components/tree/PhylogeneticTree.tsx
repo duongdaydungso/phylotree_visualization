@@ -196,6 +196,7 @@ export interface IPhylogeneticTreeProps {
   newickString: string;
   setNewickString: any;
   metadata?: Array<Object>;
+  setMetadata?: any;
   width?: number;
   height?: number;
   padding?: number;
@@ -319,6 +320,43 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
     setCollapsedList(newCollapsedList);
 
     setDropdownsMenuState(null);
+  };
+
+  const addAnnotation = (node: any, content: string) => {
+    if (!props.metadata || !node) return undefined;
+
+    let nodeName: string = node.data.name;
+
+    const emptyNameInternalNodeRegex = /^\/[1-9][0-9]*$/;
+
+    const prefixRegex = /^(.*\/)[^/]*$/;
+
+    if (!emptyNameInternalNodeRegex.test(nodeName)) {
+      if (prefixRegex.test(nodeName)) {
+        nodeName = nodeName.replace(prefixRegex, "$1");
+
+        if (nodeName[nodeName.length - 1] === "/") {
+          nodeName = nodeName.slice(0, -1);
+        }
+      }
+    }
+
+    const metadataIndex = props.metadata.findIndex(
+      (element: any) => element.name === nodeName
+    );
+
+    if (metadataIndex !== -1) {
+      const updatedMetadata = [...props.metadata];
+      updatedMetadata[metadataIndex] = {
+        ...updatedMetadata[metadataIndex],
+        annotation: content,
+      };
+      props.setMetadata(updatedMetadata);
+
+      return true;
+    }
+
+    return false;
   };
 
   const getMetadata = (node: any): Object | undefined => {
@@ -486,6 +524,7 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
             viewSubtree={viewSubtree}
             toggleHighlightBranch={toggleHighlightBranch}
             isLeaf={tree.isLeafNode(dropdownsMenuState.node)}
+            addAnnotation={props.metadata ? addAnnotation : null}
           />
         ) : null}
       </div>

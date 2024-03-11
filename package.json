@@ -46,7 +46,7 @@
     "d3-shape": "^3.1.0",
     "file-saver": "^2.0.5",
     "phylotree": "^1.4.0",
-    "react-zoom-pan-pinch": "^3.1.0",
+    "react-zoom-pan-pinch": "^3.4.3",
     "save-svg-as-png": "^1.4.17"
   },
   "browserslist": {

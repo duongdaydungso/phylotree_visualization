@@ -7,7 +7,11 @@ import { scaleLinear, scaleOrdinal } from "d3-scale";
 import { schemeCategory10 } from "d3-scale-chromatic";
 import { AxisTop } from "d3-react-axis";
 
-import { TransformWrapper, TransformComponent, MiniMap } from "react-zoom-pan-pinch";
+import {
+  TransformWrapper,
+  TransformComponent,
+  MiniMap,
+} from "react-zoom-pan-pinch";
 
 import Branch from "../branch/branch";
 
@@ -417,76 +421,71 @@ const PhylogeneticTree: React.FunctionComponent<IPhylogeneticTreeProps> = (
 
   const y_scale = scaleLinear().domain([0, tree.max_y]).range([0, height]);
 
-    const color_scale = getColorScale(tree, highlightBranches);
-    
-    var treeView = (
-        <SVG
-            id="svg-phylotree"
-            width={width + 2 * padding}
-            height={height + 2 * padding + (isShowScale ? 60 : 0)}
-          >
-            <g transform={`translate(${padding}, ${padding})`}>
-              {isShowScale ? (
-                <g>
-                  <AxisTop transform={`translate(0, 20)`} scale={x_scale} />
-                </g>
-              ) : null}
-              <g transform={`translate(0, ${isShowScale ? 60 : 0})`}>
-                {tree.links.map((link: any) => {
-                  const source_id = link.source.unique_id;
-                  const target_id = link.target.unique_id;
-                  const key = source_id + "," + target_id;
-                  const show_label =
-                    isShowInternalNode ||
-                    (isShowLabel && tree.isLeafNode(link.target));
-                  return (
-                    <Branch
-                      key={key}
-                      xScale={x_scale}
-                      yScale={y_scale}
-                      colorScale={color_scale}
-                      link={link}
-                      metadata={getMetadata(link.target)}
-                      isShowLabel={show_label}
-                      isShowBranchLength={isShowBranchLength}
-                      maxLabelWidth={maxLabelWidth}
-                      width={width}
-                      alignTips={alignTips}
-                      branchStyler={branchStyler}
-                      labelStyler={labelStyler}
-                      tooltip={props.tooltip ? tooltip : null}
-                      setTooltip={props.tooltip ? setTooltip : null}
-                      onBranchClick={setDropdownsMenuState}
-                      supportValue={supportValue}
-                      isCollapsed={isInCollapsedList(
-                        collapsedList,
-                        link.target
-                      )}
-                      isLeaf={tree.isLeafNode(link.target)}
-                    />
-                  );
-                })}
-              </g>
-            </g>
-          </SVG>
-    );
+  const color_scale = getColorScale(tree, highlightBranches);
+
+  var treeView = (
+    <SVG
+      id="svg-phylotree"
+      width={width + 2 * padding}
+      height={height + 2 * padding + (isShowScale ? 60 : 0)}
+    >
+      <g transform={`translate(${padding}, ${padding})`}>
+        {isShowScale ? (
+          <g>
+            <AxisTop transform={`translate(0, 20)`} scale={x_scale} />
+          </g>
+        ) : null}
+        <g transform={`translate(0, ${isShowScale ? 60 : 0})`}>
+          {tree.links.map((link: any) => {
+            const source_id = link.source.unique_id;
+            const target_id = link.target.unique_id;
+            const key = source_id + "," + target_id;
+            const show_label =
+              isShowInternalNode ||
+              (isShowLabel && tree.isLeafNode(link.target));
+            return (
+              <Branch
+                key={key}
+                xScale={x_scale}
+                yScale={y_scale}
+                colorScale={color_scale}
+                link={link}
+                metadata={getMetadata(link.target)}
+                isShowLabel={show_label}
+                isShowBranchLength={isShowBranchLength}
+                maxLabelWidth={maxLabelWidth}
+                width={width}
+                alignTips={alignTips}
+                branchStyler={branchStyler}
+                labelStyler={labelStyler}
+                tooltip={props.tooltip ? tooltip : null}
+                setTooltip={props.tooltip ? setTooltip : null}
+                onBranchClick={setDropdownsMenuState}
+                supportValue={supportValue}
+                isCollapsed={isInCollapsedList(collapsedList, link.target)}
+                isLeaf={tree.isLeafNode(link.target)}
+              />
+            );
+          })}
+        </g>
+      </g>
+    </SVG>
+  );
 
   return (
     <div>
-          <TransformWrapper minScale={1} maxScale={200}>
-          <div
-            style={{
-              position: "fixed",
-              zIndex: 5,
-              top: "50px",
-              right: "50px",
-            }}
-          >
-            <MiniMap width={200}>{treeView}</MiniMap>
-          </div>
-        <TransformComponent>
-            {treeView}
-        </TransformComponent>
+      <TransformWrapper minScale={1} maxScale={200}>
+        <div
+          style={{
+            position: "fixed",
+            zIndex: 5,
+            top: "50px",
+            right: "50px",
+          }}
+        >
+          <MiniMap width={200}>{treeView}</MiniMap>
+        </div>
+        <TransformComponent>{treeView}</TransformComponent>
       </TransformWrapper>
       {tooltip ? <props.tooltip {...tooltip} /> : null}
       <div ref={dropdownsMenuContainer}>

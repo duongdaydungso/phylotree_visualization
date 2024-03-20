@@ -25,8 +25,8 @@ export type PhyloVizCoreRefProps = {
 export type PhyloVizCoreProps = {
   children?: React.ReactNode;
   ref?: React.Ref<PhyloVizCoreRef>;
-  testField: string;
-  testFieldB: number;
+  testField?: string;
+  testFieldB?: number;
 };
 
 export type PhyloVizCoreSettings = Pick<PhyloVizCoreProps, "testField"> &

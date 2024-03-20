@@ -21,4 +21,9 @@ export class PhyloVizCore {
     this.props = props;
     this.settings = createSettings(this.props);
   }
+
+  update = (newProps: PhyloVizCoreProps) => {
+    this.props = newProps;
+    this.settings = createSettings(this.props);
+  };
 }

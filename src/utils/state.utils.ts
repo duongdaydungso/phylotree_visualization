@@ -1,5 +1,20 @@
-import { initialSettings } from "../constants/state.constants";
-import { PhyloVizCoreProps, PhyloVizCoreSettings } from "../models";
+import { initialSettings, initialState } from "../constants/state.constants";
+import {
+  PhyloVizCoreProps,
+  PhyloVizCoreSettings,
+  PhyloVizCoreState,
+} from "../models";
+
+export const createState = (props: PhyloVizCoreProps): PhyloVizCoreState => {
+  return {
+    tree: initialState.tree,
+    newick: initialState.newick,
+    collapsedList: initialState.collapsedList,
+    x_scale: initialState.x_scale,
+    y_scale: initialState.y_scale,
+    color_scale: initialState.color_scale,
+  };
+};
 
 export const createSettings = (
   props: PhyloVizCoreProps

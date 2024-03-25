@@ -18,8 +18,8 @@ export interface IBranchProps {
   width: number;
   maxLabelWidth: number;
   alignTips: string;
-  branchStyler: any;
-  labelStyler: any;
+  branchStyler?: any;
+  labelStyler?: any;
   branchStyle?: any;
   labelStyle?: any;
   tooltip?: any;

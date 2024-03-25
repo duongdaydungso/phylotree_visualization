@@ -4,11 +4,12 @@ export { exportImage } from "./components/utilityFunctions";
 import React from "react";
 import ReactDOM from "react-dom";
 
-import App from "./App";
+import { AppWrapper } from "./App";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    {/* <App /> */}
+    <AppWrapper />
   </React.StrictMode>,
   document.getElementById("root")
 );
